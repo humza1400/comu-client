@@ -8,21 +8,15 @@
 		"big comu"
 	],
 	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
+		"homepage": "comu.cc",
+		"sources": "https://github.com/humza1400/comu-client"
 	},
 	"license": "MIT",
 	"icon": "assets/comu/icon.png",
 	"environment": "*",
 	"entrypoints": {
-		"main": [
-			"me.comu.Comu"
-		],
 		"client": [
-			"me.comu.Client"
-		],
-		"fabric-datagen": [
-			"me.comu.ComuDataGenerator"
+			"me.comu.Comu"
 		]
 	},
 	"mixins": [
