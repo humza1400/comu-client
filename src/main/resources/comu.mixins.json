@@ -3,7 +3,9 @@
 	"package": "me.comu.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"entity.MixinClientPlayerEntity",
+		"client.MixinClientPlayerEntity",
+		"client.MixinClientConnection",
+		"entity.MixinPlayerEntity",
 		"io.MixinKeyboard",
 		"network.MixinClientPlayNetworkHandler"
 	],

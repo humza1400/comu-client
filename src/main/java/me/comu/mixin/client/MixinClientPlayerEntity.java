@@ -1,4 +1,4 @@
-package me.comu.mixin.entity;
+package me.comu.mixin.client;
 
 import me.comu.Comu;
 import me.comu.events.MotionEvent;

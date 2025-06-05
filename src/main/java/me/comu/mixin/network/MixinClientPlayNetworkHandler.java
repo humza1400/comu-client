@@ -1,7 +1,6 @@
 package me.comu.mixin.network;
 
 import me.comu.Comu;
-import me.comu.command.CommandManager;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
