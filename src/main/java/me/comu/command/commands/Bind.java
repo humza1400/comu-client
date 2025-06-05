@@ -10,8 +10,8 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
-public class BindCommand extends Command {
-    public BindCommand() {
+public class Bind extends Command {
+    public Bind() {
         super(List.of("bind"), List.of(
                 new Argument("module"),
                 new Argument("key")

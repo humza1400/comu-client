@@ -1,5 +1,6 @@
 package me.comu;
 
+import me.comu.account.MicrosoftLogin;
 import me.comu.api.registry.event.EventManager;
 import me.comu.api.registry.event.IEventManager;
 import me.comu.command.CommandManager;
@@ -7,6 +8,7 @@ import me.comu.config.ConfigManager;
 import me.comu.keybind.KeybindManager;
 import me.comu.module.Module;
 import me.comu.module.ModuleManager;
+import me.comu.render.HUDRenderer;
 import net.fabricmc.api.ClientModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -18,7 +20,7 @@ import java.io.File;
 
 public class Comu implements ClientModInitializer {
 
-	public static final String CLIENT_NAME = "comu";
+	public static final String CLIENT_NAME = "comu b4";
 	public static final Logger LOGGER = LoggerFactory.getLogger(CLIENT_NAME);
 
 	private static Comu instance;
@@ -37,12 +39,15 @@ public class Comu implements ClientModInitializer {
 
 		File configRoot = new File(FabricLoader.getInstance().getGameDir().toFile(), "comu");
 		this.configManager = new ConfigManager(configRoot);
-
 		this.eventManager = new EventManager();
 		this.keybindManager = new KeybindManager();
 		this.moduleManager = new ModuleManager();
 		this.commandManager = new CommandManager();
 		this.configManager.loadAll();
+
+		// This will be deprecated because we don't use skid code, just here temporarily
+		MicrosoftLogin.setUserMicrosoft("", "");
+		HUDRenderer.init();
 		LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
 
 		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> Comu.getInstance().getConfigManager().saveAll());

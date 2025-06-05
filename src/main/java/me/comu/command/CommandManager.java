@@ -1,7 +1,8 @@
 package me.comu.command;
 
 import me.comu.api.registry.Registry;
-import me.comu.command.commands.BindCommand;
+import me.comu.command.commands.Bind;
+import me.comu.command.commands.Toggle;
 import me.comu.logging.Logger;
 
 import java.util.ArrayList;
@@ -12,7 +13,8 @@ public class CommandManager extends Registry<Command> {
 
     public CommandManager() {
         registry = new ArrayList<>();
-        register(new BindCommand());
+        register(new Bind());
+        register(new Toggle());
     }
 
 

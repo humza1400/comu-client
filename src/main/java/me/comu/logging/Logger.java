@@ -20,6 +20,14 @@ public final class Logger {
         Comu.LOGGER.info(message);
     }
 
+    public void print(String message, LogType type) {
+        switch (type) {
+            case INFO -> Comu.LOGGER.info(message);
+            case WARN -> Comu.LOGGER.warn(message);
+            case ERROR -> Comu.LOGGER.error(message);
+        }
+    }
+
     public void printToChat(String message) {
         MinecraftClient client = MinecraftClient.getInstance();
         if (client.player != null) {
@@ -33,4 +41,11 @@ public final class Logger {
             );
         }
     }
+
+    public enum LogType {
+        INFO,
+        WARN,
+        ERROR
+    }
+
 }

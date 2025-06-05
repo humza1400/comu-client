@@ -2,6 +2,7 @@ package me.comu.module;
 
 import me.comu.api.registry.Registry;
 import me.comu.module.impl.movement.Sprint;
+import me.comu.module.impl.render.HUD;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -14,9 +15,7 @@ public class ModuleManager extends Registry<Module> {
         // Active
 
         // Combat
-        Sprint sprint = new Sprint();
-        register(sprint);
-        sprint.setEnabled(true);
+        register(new Sprint());
 
         // Exploits
 
@@ -25,7 +24,7 @@ public class ModuleManager extends Registry<Module> {
         // Movement
 
         // Render
-
+        register(new HUD());
         // World
     }
 
@@ -42,5 +41,13 @@ public class ModuleManager extends Registry<Module> {
     public List<Module> getModules() {
         return registry;
     }
+
+    public List<ToggleableModule> getToggleableModules() {
+        return registry.stream()
+                .filter(module -> module instanceof ToggleableModule)
+                .map(module -> (ToggleableModule) module)
+                .toList();
+    }
+
 
 }
