@@ -1,15 +1,26 @@
 package me.comu.module;
 
 import me.comu.Comu;
+import me.comu.keybind.Keybind;
+import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
 public class ToggleableModule extends Module {
     private boolean enabled;
     private boolean drawn = true;
+    private final Keybind keybind;
 
     public ToggleableModule(String name, List<String> aliases, Category category, String description) {
         super(name, aliases, category, description);
+        this.keybind = new Keybind(name, GLFW.GLFW_KEY_UNKNOWN) {
+            @Override
+            public void onPress() {
+                toggle();
+            }
+        };
+
+        Comu.getInstance().getKeybindManager().register(keybind);
     }
 
     public void onEnable() {
@@ -42,5 +53,9 @@ public class ToggleableModule extends Module {
 
     public boolean isDrawn() {
         return drawn;
+    }
+
+    public Keybind getKeybind() {
+        return keybind;
     }
 }

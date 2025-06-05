@@ -15,9 +15,7 @@ public class Sprint extends ToggleableModule {
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
-                Comu.getInstance().getLogger().info("about to sprint");
                 if (event.isPre() && mc.player != null && mc.player.input.hasForwardMovement() && !mc.player.isSneaking() && !mc.player.isUsingItem() && !mc.player.horizontalCollision) {
-                    Comu.getInstance().getLogger().info("sprinting");
                     mc.player.setSprinting(true);
                 }
             }

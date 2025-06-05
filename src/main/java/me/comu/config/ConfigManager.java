@@ -1,0 +1,41 @@
+package me.comu.config;
+
+import me.comu.config.configs.ModulesConfig;
+import me.comu.logging.Logger;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
+public class ConfigManager {
+    private final List<Config> configs = new ArrayList<>();
+    private final File configDir;
+
+    public ConfigManager(File baseDirectory) {
+        this.configDir = baseDirectory;
+        if (!configDir.exists()) configDir.mkdirs();
+
+        register(new ModulesConfig(baseDirectory));
+    }
+
+    public void register(Config config) {
+        configs.add(config);
+    }
+
+    public void saveAll() {
+        for (Config config : configs) {
+            config.save();
+        }
+    }
+
+    public void loadAll() {
+        for (Config config : configs) {
+            Logger.getLogger().print("Loading config: " + config.getName());
+            config.load();
+        }
+    }
+
+    public File getConfigDirectory() {
+        return configDir;
+    }
+}

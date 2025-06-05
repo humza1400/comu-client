@@ -22,6 +22,10 @@ public class MixinClientPlayerEntity {
 
     @Inject(method = "tickMovement", at = @At("TAIL"))
     private void onPostTickMovement(CallbackInfo ci) {
-        Comu.getInstance().getEventManager().dispatch(new MotionEvent(MotionEvent.Phase.POST));
+        MotionEvent event = new MotionEvent(MotionEvent.Phase.POST);
+        Comu.getInstance().getEventManager().dispatch(event);
+        if (event.isCancelled()) {
+            ci.cancel();
+        }
     }
 }

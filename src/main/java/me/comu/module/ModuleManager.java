@@ -3,6 +3,7 @@ package me.comu.module;
 import me.comu.api.registry.Registry;
 import me.comu.module.impl.movement.Sprint;
 
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 public class ModuleManager extends Registry<Module> {
@@ -30,9 +31,16 @@ public class ModuleManager extends Registry<Module> {
 
     public Module getModuleByName(String name) {
         return registry.stream()
-                .filter(module -> module.getAliases().stream()
-                        .anyMatch(alias -> alias.equalsIgnoreCase(name)))
+                .filter(module ->
+                        module.getName().equalsIgnoreCase(name) ||
+                                module.getAliases().stream().anyMatch(alias -> alias.equalsIgnoreCase(name)))
                 .findFirst()
                 .orElse(null);
     }
+
+
+    public List<Module> getModules() {
+        return registry;
+    }
+
 }
