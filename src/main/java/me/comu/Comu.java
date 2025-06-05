@@ -46,7 +46,7 @@ public class Comu implements ClientModInitializer {
 		this.configManager.loadAll();
 
 		// This will be deprecated because we don't use skid code, just here temporarily
-		MicrosoftLogin.setUserMicrosoft("", "");
+		MicrosoftLogin.setUserMicrosoft("","");
 		HUDRenderer.init();
 		LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
 
