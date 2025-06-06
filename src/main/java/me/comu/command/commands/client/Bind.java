@@ -1,8 +1,9 @@
-package me.comu.command.commands;
+package me.comu.command.commands.client;
 
 import me.comu.Comu;
 import me.comu.command.Argument;
 import me.comu.command.Command;
+import me.comu.command.CommandType;
 import me.comu.module.Module;
 import me.comu.module.ToggleableModule;
 import me.comu.keybind.Keybind;
@@ -15,7 +16,7 @@ public class Bind extends Command {
         super(List.of("bind"), List.of(
                 new Argument("module"),
                 new Argument("key")
-        ));
+        ), CommandType.CLIENT);
     }
 
     @Override

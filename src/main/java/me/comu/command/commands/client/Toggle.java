@@ -1,8 +1,9 @@
-package me.comu.command.commands;
+package me.comu.command.commands.client;
 
 import me.comu.Comu;
 import me.comu.command.Argument;
 import me.comu.command.Command;
+import me.comu.command.CommandType;
 import me.comu.module.Module;
 import me.comu.module.ToggleableModule;
 
@@ -12,7 +13,7 @@ public class Toggle extends Command {
     public Toggle() {
         super(List.of("toggle","t"), List.of(
                 new Argument("module")
-        ));
+        ), CommandType.CLIENT);
     }
 
     @Override

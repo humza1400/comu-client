@@ -7,8 +7,10 @@ import com.google.gson.JsonObject;
 import me.comu.Comu;
 import me.comu.config.Config;
 import me.comu.keybind.Keybind;
+import me.comu.logging.Logger;
 import me.comu.module.Module;
 import me.comu.module.ToggleableModule;
+import me.comu.utils.PropertyUtils;
 
 import java.io.File;
 import java.io.FileReader;
@@ -41,7 +43,11 @@ public class ModulesConfig extends Config {
                 }
             }
 
-            // In future: add module.getProperties() here
+            JsonObject properties = new JsonObject();
+            for (var property : module.getProperties()) {
+                properties.addProperty(property.getName(), PropertyUtils.serializeValue(property));
+            }
+            object.add("properties", properties);
 
             array.add(object);
         }
@@ -50,6 +56,7 @@ public class ModulesConfig extends Config {
             GSON.toJson(array, writer);
         } catch (Exception e) {
             e.printStackTrace();
+            Logger.getLogger().print("Error saving modules config: " + e.getMessage(), Logger.LogType.ERROR);
         }
     }
 
@@ -81,10 +88,21 @@ public class ModulesConfig extends Config {
                     }
                 }
 
-                // In future: load module properties here
+                if (obj.has("properties")) {
+                    JsonObject props = obj.getAsJsonObject("properties");
+
+                    for (var property : module.getProperties()) {
+                        if (!props.has(property.getName())) continue;
+                        String value = props.get(property.getName()).getAsString();
+                        Object parsed = PropertyUtils.parseValue(property, value);
+                        PropertyUtils.safelySet(property, parsed);
+
+                    }
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
+            Logger.getLogger().print("Error loading modules config: " + e.getMessage(), Logger.LogType.ERROR);
         }
     }
 }

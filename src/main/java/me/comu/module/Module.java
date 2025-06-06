@@ -1,14 +1,17 @@
 package me.comu.module;
 
 import me.comu.api.registry.event.listener.Listener;
+import me.comu.property.Property;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public abstract class Module {
     private final String name;
     private final List<String> aliases;
+    private final List<Property<?>> properties = new ArrayList<>();
     private final Category category;
     private final String description;
 
@@ -21,6 +24,23 @@ public abstract class Module {
         this.aliases = aliases;
         this.category = category;
         this.description = description;
+    }
+
+    protected void offerProperties(Property<?>... properties) {
+        this.properties.clear();
+        this.properties.addAll(Arrays.asList(properties));
+    }
+
+    public Property<?> getPropertyByName(String name) {
+        for (Property<?> prop : properties) {
+            if (prop.getName().equalsIgnoreCase(name))
+                return prop;
+            for (String alias : prop.getAliases()) {
+                if (alias.equalsIgnoreCase(name))
+                    return prop;
+            }
+        }
+        return null;
     }
 
     public String getName() {
@@ -37,5 +57,9 @@ public abstract class Module {
 
     public String getDescription() {
         return description;
+    }
+
+    public List<Property<?>> getProperties() {
+        return properties;
     }
 }

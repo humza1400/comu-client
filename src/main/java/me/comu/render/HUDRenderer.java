@@ -24,7 +24,7 @@ public final class HUDRenderer {
         HUD hud = (HUD) Comu.getInstance().getModuleManager().getModuleByName("HUD");
         if (hud == null || !hud.isEnabled()) return;
 
-        Renderer.drawTextWithBackground(context, Formatting.RED + Comu.CLIENT_NAME, 4, 4, 0xFFFFFFFF, 0x90000000, true);
+        Renderer.drawTextWithBackground(context, Formatting.RED + Comu.getClientName() + Formatting.GRAY + " b" + Comu.getClientVersion(), 4, 4, 0xFFFFFFFF, 0x90000000, true);
 
 
         int screenWidth = mc.getWindow().getScaledWidth();

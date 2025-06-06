@@ -8,10 +8,12 @@ import java.util.stream.Collectors;
 public abstract class Command {
     private final List<String> aliases;
     private final List<Argument> arguments;
+    private final CommandType commandType;
 
-    protected Command(List<String> aliases, List<Argument> arguments) {
+    protected Command(List<String> aliases, List<Argument> arguments, CommandType commandType) {
         this.aliases = aliases;
         this.arguments = arguments;
+        this.commandType = commandType;
     }
 
     public boolean matches(String inputAlias) {
@@ -34,18 +36,28 @@ public abstract class Command {
         return null;
     }
 
+    public String getName() {
+        return aliases.getFirst();
+    }
+
     public List<String> getAliases() {
         return aliases;
     }
 
     public String getSyntax() {
-        return "\2477" + aliases.get(0) + " " + arguments.stream()
-                .map(arg -> "\247e<" + arg.getLabel() + ">")
+        return "\2477" + aliases.getFirst() + " " + arguments.stream()
+                .map(arg -> arg.isOptional()
+                        ? "\2478<" + arg.getLabel() + ">"
+                        : "\247e<" + arg.getLabel() + ">")
                 .collect(Collectors.joining(" "));
     }
 
     public final String dispatch(String[] input) {
-        if (input.length - 1 < arguments.size()) {
+        long requiredArgs = arguments.stream()
+                .filter(arg -> !arg.isOptional())
+                .count();
+
+        if (input.length - 1 < requiredArgs) {
             return Comu.getInstance().getCommandManager().getPrefix() + getSyntax();
         } else if (input.length - 1 > arguments.size()) {
             return "\247cToo many arguments. Max: \247e" + arguments.size() + "\247c.";
@@ -55,7 +67,7 @@ public abstract class Command {
             arguments.get(i).setValue(i + 1 < input.length ? input[i + 1] : null);
         }
 
-        boolean allValid = arguments.stream().allMatch(Argument::isPresent);
+        boolean allValid = arguments.stream().filter(arg -> !arg.isOptional()).allMatch(Argument::isPresent);
         if (!allValid) {
             return "\247cInvalid argument(s).";
         }
@@ -67,6 +79,9 @@ public abstract class Command {
         }
     }
 
+    public CommandType getCommandType() {
+        return commandType;
+    }
 
     public abstract String dispatch();
 }

@@ -34,7 +34,7 @@ public final class Logger {
             client.player.sendMessage(
                     Text.literal("[")
                             .formatted(Formatting.GRAY)
-                            .append(Text.literal(Comu.CLIENT_NAME).formatted(Formatting.RED))
+                            .append(Text.literal(Comu.getClientName()).formatted(Formatting.RED))
                             .append(Text.literal("] ").formatted(Formatting.GRAY))
                             .append(Text.literal(message.replace("&", "§")).formatted(Formatting.GRAY)),
                     false

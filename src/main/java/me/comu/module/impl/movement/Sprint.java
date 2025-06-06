@@ -4,10 +4,12 @@ import me.comu.api.registry.event.listener.Listener;
 import me.comu.events.MotionEvent;
 import me.comu.events.PacketEvent;
 import me.comu.events.SprintAttackEvent;
-import me.comu.events.TickEvent;
-import me.comu.logging.Logger;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
+import me.comu.property.properties.BooleanProperty;
+import me.comu.property.properties.EnumProperty;
+import me.comu.property.properties.InputProperty;
+import me.comu.property.properties.NumberProperty;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 
@@ -15,11 +17,18 @@ import java.util.List;
 
 public class Sprint extends ToggleableModule {
 
-    boolean multiDir = true;
-    boolean keepSprint = true;
+    BooleanProperty multiDir = new BooleanProperty("Multi-Directional", List.of("multi", "omni", "omnisprint", "multidir", "multidirectional", "multidirection"), true);
+    BooleanProperty keepSprint = new BooleanProperty("Keep Sprint", List.of("keepsprint", "keepsprinting"), true);
+    NumberProperty<Integer> multiplier = new NumberProperty<>("multiplier", List.of(), 1, 0, 10, 1);
+    EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VULCAN);
+    InputProperty testInputProperty = new InputProperty("Message", List.of("msg"), "This is a test input property");
+
+    public enum Mode {VANILLA, VULCAN}
+
 
     public Sprint() {
         super("Sprint", List.of("autorun", "autosprint"), Category.MOVEMENT, "Automatically sprints for you");
+        offerProperties(multiDir, keepSprint, mode, multiplier, testInputProperty);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
@@ -32,12 +41,14 @@ public class Sprint extends ToggleableModule {
         listeners.add(new Listener<>(PacketEvent.class) {
             @Override
             public void call(PacketEvent event) {
-                if (event.getDirection() == PacketEvent.Direction.OUTGOING) {
-                    Packet<?> packet = event.getPacket();
-                    if (packet instanceof ClientCommandC2SPacket cmdPacket) {
-                        ClientCommandC2SPacket.Mode mode = cmdPacket.getMode();
-                        if (mode == ClientCommandC2SPacket.Mode.START_SPRINTING || mode == ClientCommandC2SPacket.Mode.STOP_SPRINTING) {
-                            event.setCancelled(true);
+                if (mode.getValue() == Mode.VULCAN) {
+                    if (event.getDirection() == PacketEvent.Direction.OUTGOING) {
+                        Packet<?> packet = event.getPacket();
+                        if (packet instanceof ClientCommandC2SPacket cmdPacket) {
+                            ClientCommandC2SPacket.Mode mode = cmdPacket.getMode();
+                            if (mode == ClientCommandC2SPacket.Mode.START_SPRINTING || mode == ClientCommandC2SPacket.Mode.STOP_SPRINTING) {
+                                event.setCancelled(true);
+                            }
                         }
                     }
                 }
@@ -47,7 +58,7 @@ public class Sprint extends ToggleableModule {
         listeners.add(new Listener<>(SprintAttackEvent.class) {
             @Override
             public void call(SprintAttackEvent event) {
-                if (keepSprint) {
+                if (keepSprint.getValue()) {
                     event.setCancelled(true);
                 }
             }
@@ -66,7 +77,7 @@ public class Sprint extends ToggleableModule {
         if (mc.player == null || mc.player.isSneaking() || mc.player.horizontalCollision || (mc.player.getHungerManager().getFoodLevel() <= 6 && !mc.player.isCreative()))
             return false;
 
-        return multiDir
+        return multiDir.getValue()
                 ? mc.player.input.getMovementInput().x != 0.0f || mc.player.input.getMovementInput().y != 0.0f
                 : mc.options.forwardKey.isPressed() && mc.player.input.getMovementInput().y > 0;
 

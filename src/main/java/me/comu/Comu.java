@@ -21,61 +21,70 @@ import java.io.File;
 
 public class Comu implements ClientModInitializer {
 
-	public static final String CLIENT_NAME = "comu b4";
-	public static final Logger LOGGER = LoggerFactory.getLogger(CLIENT_NAME);
+    private static final String CLIENT_NAME = "comu";
+    private static final int CLIENT_VERSION = 4;
+    public static final Logger LOGGER = LoggerFactory.getLogger(CLIENT_NAME);
 
-	private static Comu instance;
-	private long startTime;
+    private static Comu instance;
+    private long startTime;
 
-	private IEventManager eventManager;
-	private KeybindManager keybindManager;
-	private ModuleManager moduleManager;
-	private CommandManager commandManager;
-	private ConfigManager configManager;
+    private IEventManager eventManager;
+    private KeybindManager keybindManager;
+    private ModuleManager moduleManager;
+    private CommandManager commandManager;
+    private ConfigManager configManager;
 
-	@Override
-	public void onInitializeClient() {
-		instance = this;
-		startTime = System.nanoTime() / 1000000L;
+    @Override
+    public void onInitializeClient() {
+        instance = this;
+        startTime = System.nanoTime() / 1000000L;
 
-		File configRoot = new File(FabricLoader.getInstance().getGameDir().toFile(), "comu");
-		this.configManager = new ConfigManager(configRoot);
-		this.eventManager = new EventManager();
-		this.keybindManager = new KeybindManager();
-		this.moduleManager = new ModuleManager();
-		this.commandManager = new CommandManager();
-		this.configManager.loadAll();
+        File configRoot = new File(FabricLoader.getInstance().getGameDir().toFile(), "comu");
+        this.configManager = new ConfigManager(configRoot);
+        this.eventManager = new EventManager();
+        this.keybindManager = new KeybindManager();
+        this.moduleManager = new ModuleManager();
+        this.commandManager = new CommandManager();
+        this.configManager.loadAll();
 
-		// This will be deprecated because we don't use skid code, just here temporarily
-		MicrosoftLogin.setUserMicrosoft("","");
-		Hook.init();
-		HUDRenderer.init();
-		LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
+        // This will be deprecated because we don't use skid code, just here temporarily
+        MicrosoftLogin.setUserMicrosoft("", "");
+        Hook.init();
+        HUDRenderer.init();
+        LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
 
-		ClientLifecycleEvents.CLIENT_STOPPING.register(client -> Comu.getInstance().getConfigManager().saveAll());
-	}
+        ClientLifecycleEvents.CLIENT_STOPPING.register(client -> Comu.getInstance().getConfigManager().saveAll());
+    }
 
-	public static Comu getInstance() {
-		return instance;
-	}
+    public static String getClientName() {
+        return CLIENT_NAME;
+    }
 
-	public IEventManager getEventManager() {
-		return eventManager;
-	}
+    public static int getClientVersion() {
+        return CLIENT_VERSION;
+    }
 
-	public KeybindManager getKeybindManager() {
-		return keybindManager;
-	}
+    public static Comu getInstance() {
+        return instance;
+    }
 
-	public ModuleManager getModuleManager() {
-		return moduleManager;
-	}
+    public IEventManager getEventManager() {
+        return eventManager;
+    }
 
-	public CommandManager getCommandManager() {
-		return commandManager;
-	}
+    public KeybindManager getKeybindManager() {
+        return keybindManager;
+    }
 
-	public ConfigManager getConfigManager() {
-		return configManager;
-	}
+    public ModuleManager getModuleManager() {
+        return moduleManager;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
+    }
 }
