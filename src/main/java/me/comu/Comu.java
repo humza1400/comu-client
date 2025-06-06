@@ -5,6 +5,7 @@ import me.comu.api.registry.event.EventManager;
 import me.comu.api.registry.event.IEventManager;
 import me.comu.command.CommandManager;
 import me.comu.config.ConfigManager;
+import me.comu.hooks.Hook;
 import me.comu.keybind.KeybindManager;
 import me.comu.module.Module;
 import me.comu.module.ModuleManager;
@@ -47,6 +48,7 @@ public class Comu implements ClientModInitializer {
 
 		// This will be deprecated because we don't use skid code, just here temporarily
 		MicrosoftLogin.setUserMicrosoft("","");
+		Hook.init();
 		HUDRenderer.init();
 		LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
 

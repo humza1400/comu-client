@@ -4,6 +4,8 @@ import me.comu.api.registry.event.listener.Listener;
 import me.comu.events.MotionEvent;
 import me.comu.events.PacketEvent;
 import me.comu.events.SprintAttackEvent;
+import me.comu.events.TickEvent;
+import me.comu.logging.Logger;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import net.minecraft.network.packet.Packet;
@@ -61,7 +63,7 @@ public class Sprint extends ToggleableModule {
     }
 
     public boolean canSprint() {
-        if (mc.player == null || mc.player.isSneaking() || mc.player.horizontalCollision || mc.player.getHungerManager().getFoodLevel() <= 6)
+        if (mc.player == null || mc.player.isSneaking() || mc.player.horizontalCollision || (mc.player.getHungerManager().getFoodLevel() <= 6 && !mc.player.isCreative()))
             return false;
 
         return multiDir
