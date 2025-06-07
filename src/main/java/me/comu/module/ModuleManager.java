@@ -1,7 +1,10 @@
 package me.comu.module;
 
 import me.comu.api.registry.Registry;
+import me.comu.module.impl.movement.Fly;
+import me.comu.module.impl.movement.Speed;
 import me.comu.module.impl.movement.Sprint;
+import me.comu.module.impl.movement.Velocity;
 import me.comu.module.impl.render.HUD;
 
 import java.util.List;
@@ -15,13 +18,17 @@ public class ModuleManager extends Registry<Module> {
         // Active
 
         // Combat
-        register(new Sprint());
 
         // Exploits
+
 
         // Miscellaneous
 
         // Movement
+        register(new Sprint());
+        register(new Speed());
+        register(new Fly());
+        register(new Velocity());
 
         // Render
         register(new HUD());
