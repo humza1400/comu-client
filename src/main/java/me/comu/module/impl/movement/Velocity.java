@@ -20,7 +20,6 @@ public class Velocity extends ToggleableModule {
                 if(p instanceof EntityVelocityUpdateS2CPacket){
                     event.setCancelled(true);
                 }
-
             }
         });
     }

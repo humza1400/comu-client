@@ -4,6 +4,7 @@ import me.comu.api.registry.event.listener.Listener;
 import me.comu.api.stopwatch.Stopwatch;
 import me.comu.events.MotionEvent;
 import me.comu.events.TickEvent;
+import me.comu.logging.Logger;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.BooleanProperty;
@@ -12,13 +13,16 @@ import me.comu.property.properties.NumberProperty;
 import me.comu.utils.RotationUtils;
 import net.minecraft.entity.Entity;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.StreamSupport;
 
 public class KillAura extends ToggleableModule {
 
     BooleanProperty mobs = new BooleanProperty("Monsters", List.of("mobs", "mob", "zombie", "zombies", "skeleton", "skeletons"), true);
-    BooleanProperty passives = new BooleanProperty("Passives", List.of("passive", "villager", "villagers", "neutral","neutrals", "animal", "cow", "cows", "sheep"), true);
+    BooleanProperty passives = new BooleanProperty("Passives", List.of("passive", "villager", "villagers", "neutral", "neutrals", "animal", "cow", "cows", "sheep"), true);
     BooleanProperty players = new BooleanProperty("Players", List.of("player", "people"), true);
     BooleanProperty rayTrace = new BooleanProperty("Ray-Trace", List.of("raytrace", "rayt", "ray", "rt"), true);
     BooleanProperty cooldownAttack = new BooleanProperty("Cooldown", List.of("1.9pvp", "19pvp", "1.9", "19", "cd"), false);
@@ -34,6 +38,7 @@ public class KillAura extends ToggleableModule {
     private final Stopwatch stopwatch = new Stopwatch();
     private Entity target = null;
     private Entity lastTarget = null;
+    private float currentYaw, currentPitch;
 
     public KillAura() {
         super("Kill Aura", List.of("aura", "ka"), Category.MOVEMENT, "Automatically starts attacking any valid targets around you");
@@ -43,11 +48,37 @@ public class KillAura extends ToggleableModule {
             public void call(MotionEvent event) {
                 if (event.isPre()) {
                     updateTarget();
-                    if (target != null) {
-                        float[] rotations = RotationUtils.getRotations(target);
-                        event.setYaw(rotations[0]);
-                        event.setPitch(rotations[1]);
+                    if (target == null) {
+                        float baseYaw = mc.player.getYaw();
+                        float basePitch = mc.player.getPitch();
+
+                        float[] normalized = normalizeRotation(baseYaw, basePitch, currentYaw, currentPitch, 1.5F);
+
+                        currentYaw = normalized[0];
+                        currentPitch = normalized[1];
+
+                        event.setYaw(currentYaw);
+                        event.setPitch(currentPitch);
+                        return;
                     }
+
+                    float baseYaw = currentYaw;
+                    float basePitch = currentPitch;
+
+                    float[] rotations = RotationUtils.getRotations(target);
+
+                    float rawTargetYaw = rotations[0];
+                    float targetYaw = wrapYawToBase(rawTargetYaw, baseYaw);
+                    float targetPitch = clamp(rotations[1], -87f, 87f);
+
+                    float[] normalized = normalizeRotation(targetYaw, (float) (targetPitch + getRandomInRange(-5, 5)), baseYaw, basePitch, 1.5F);
+
+                    currentYaw = normalized [0];
+                    currentPitch = normalized[1];
+
+                    event.setYaw(currentYaw);
+                    event.setPitch(currentPitch);
+                    Logger.getLogger().print("Yaw " + currentYaw + " Pitch " + currentPitch);
                 }
             }
         });
@@ -81,7 +112,15 @@ public class KillAura extends ToggleableModule {
     @Override
     public void onDisable() {
         super.onDisable();
+        if(isPlayerOrWorldNull(mc)) return;
         target = null;
+    }
+
+    public void onEnable() {
+        super.onEnable();
+        if(isPlayerOrWorldNull(mc)) return;
+        currentYaw = mc.player.getYaw();
+        currentPitch = mc.player.getPitch();
     }
 
     private void updateTarget() {
@@ -136,6 +175,68 @@ public class KillAura extends ToggleableModule {
         }
 
         return mc.player.distanceTo(entity) <= range.getValue();
+    }
+
+    public static double getRandomInRange(double min, double max) {
+        Random random = new Random();
+        double range = max - min;
+        double scaled = random.nextDouble() * range;
+        if (scaled > max) {
+            scaled = max;
+        }
+        double shifted = scaled + min;
+
+        if (shifted > max) {
+            shifted = max;
+        }
+        return shifted;
+    }
+
+    private double getGCD() {
+        double sensitivity = mc.options.getMouseSensitivity().getValue(); // Float value 0.0 - 1.0
+        double f = sensitivity * 0.6 + 0.2;
+        return f * f * f * 8.0 * 0.15;
+    }
+
+    private float[] normalizeRotation(float targetYaw, float targetPitch, float baseYaw, float basePitch, float smoothFactor) {
+        double gcd = getGCD();
+
+        float yawDelta = RotationUtils.getAngleDelta(baseYaw, targetYaw);
+        float pitchDelta = targetPitch - basePitch;
+
+        float baseYawChange = 80f;
+        float basePitchChange = 22.0f;
+
+        float maxYawChange = addRandomization(baseYawChange, 2.0f);
+        float maxPitchChange = addRandomization(basePitchChange, 1.5f);
+
+        float smoothedYawDelta = Math.max(-maxYawChange, Math.min(yawDelta * smoothFactor, maxYawChange));
+        float smoothedPitchDelta = Math.max(-maxPitchChange, Math.min(pitchDelta * smoothFactor, maxPitchChange));
+
+        float normalizedYaw = baseYaw + Math.round(smoothedYawDelta / (float)gcd) * (float)gcd;
+        float normalizedPitch = basePitch + Math.round(smoothedPitchDelta / (float)gcd) * (float)gcd;
+
+        normalizedPitch = clamp(normalizedPitch, -90f, 90f);
+
+        return new float[]{normalizedYaw, normalizedPitch};
+    }
+    private static float clamp(float v, float mn, float mx) {
+        return v < mn ? mn : Math.min(v, mx);
+    }
+
+    private static float addRandomization(float value, float maxVariation) {
+        return value + (ThreadLocalRandom.current().nextFloat() - 0.5f) * maxVariation;
+    }
+
+    public static float wrapYawToBase(float targetYaw, float baseYaw) {
+        float wrapped = targetYaw;
+        while (wrapped < baseYaw - 180.0f) {
+            wrapped += 360.0f;
+        }
+        while (wrapped >= baseYaw + 180.0f) {
+            wrapped -= 360.0f;
+        }
+        return wrapped;
     }
 
 }

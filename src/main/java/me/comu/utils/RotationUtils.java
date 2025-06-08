@@ -42,4 +42,11 @@ public final class RotationUtils {
 
         return new float[]{yaw, pitch};
     }
+
+    public static float getAngleDelta(float from, float to) {
+        float delta = ((to - from + 540f) % 360f) - 180f;
+        return delta;
+    }
+
+
 }

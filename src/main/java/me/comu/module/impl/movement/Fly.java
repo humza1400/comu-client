@@ -6,6 +6,7 @@ import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.EnumProperty;
 import me.comu.property.properties.NumberProperty;
+import me.comu.utils.MovementUtils;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.Vec2f;
@@ -31,9 +32,9 @@ public class Fly extends ToggleableModule {
                         if (mc.player != null && mc.world != null) {
                             mc.player.getAbilities().flying = false;
                             if (!mc.options.sneakKey.isPressed())
-                                setMoveSpeedFly(speed.getValue(), mc.options.jumpKey.isPressed() ? 0.3f : 0);
+                                MovementUtils.setMoveSpeedFly(speed.getValue(), mc.options.jumpKey.isPressed() ? 0.3f : 0);
                             if (mc.options.sneakKey.isPressed())
-                                setMoveSpeedFly(speed.getValue(), -0.3F);
+                                MovementUtils.setMoveSpeedFly(speed.getValue(), -0.3F);
                         }
                         return;
                         case VANILLA:
@@ -56,45 +57,6 @@ public class Fly extends ToggleableModule {
         mc.player.getAbilities().flying = false;
     }
 
-    private void setMoveSpeedFly(double speed, double motionY) {
-        ClientPlayerEntity player = mc.player;
-
-        if (player == null) return;
-
-        Vec2f movementInput = player.input.getMovementInput();
-        float forward = movementInput.y;
-        float strafe = movementInput.x;
-        float yaw = player.getYaw();
-
-        if (forward == 0.0F && strafe == 0.0F) {
-            player.setVelocity(Vec3d.ZERO);
-        } else {
-            if (forward != 0.0F) {
-                if (strafe > 0.0F) {
-                    yaw += (forward > 0.0F ? -45F : 45F);
-                } else if (strafe < 0.0F) {
-                    yaw += (forward > 0.0F ? 45F : -45F);
-                }
-
-                strafe = 0.0F;
-
-                if (forward > 0.0F) {
-                    forward = 1.0F;
-                } else if (forward < 0.0F) {
-                    forward = -1.0F;
-                }
-            }
-
-            double rad = Math.toRadians(yaw);
-            double sin = -Math.sin(rad);
-            double cos = Math.cos(rad);
-
-            double motionX = forward * speed * sin + strafe * speed * cos;
-            double motionZ = forward * speed * cos - strafe * speed * sin;
-
-            player.setVelocity(motionX, motionY, motionZ);
-        }
-    }
 
     public enum Mode {VANILLA, CUSTOM, TESTING}
 }
