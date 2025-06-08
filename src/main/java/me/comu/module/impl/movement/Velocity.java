@@ -12,7 +12,7 @@ import java.util.List;
 
 public class Velocity extends ToggleableModule {
     public Velocity() {
-        super("Velocity", List.of(), Category.MOVEMENT, "makes you take less Velocity");
+        super("Velocity", List.of("antivelocity", "vel", "antikb"), Category.MOVEMENT, "Modifies how much velocity you take");
         listeners.add(new Listener<>(PacketEvent.class) {
             @Override
             public void call(final PacketEvent event) {

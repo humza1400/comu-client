@@ -34,6 +34,10 @@ public class ModulesConfig extends Config {
             JsonObject object = new JsonObject();
             object.addProperty("name", module.getName());
 
+            if (!module.getDisplayName().equals(module.getName())) {
+                object.addProperty("displayName", module.getDisplayName());
+            }
+
             if (module instanceof ToggleableModule toggleable) {
                 object.addProperty("enabled", toggleable.isEnabled());
 
@@ -72,7 +76,15 @@ public class ModulesConfig extends Config {
                 String name = obj.get("name").getAsString();
 
                 Module module = Comu.getInstance().getModuleManager().getModuleByName(name);
-                if (module == null) continue;
+                if (module == null) {
+                    Logger.getLogger().print("Module not found: " + name, Logger.LogType.WARN);
+                    continue;
+                }
+
+                if (obj.has("displayName")) {
+                    String displayName = obj.get("displayName").getAsString();
+                    module.setDisplayName(displayName);
+                }
 
                 if (module instanceof ToggleableModule toggleable) {
                     if (obj.has("enabled")) {
@@ -101,8 +113,8 @@ public class ModulesConfig extends Config {
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
             Logger.getLogger().print("Error loading modules config: " + e.getMessage(), Logger.LogType.ERROR);
+            e.printStackTrace();
         }
     }
 }

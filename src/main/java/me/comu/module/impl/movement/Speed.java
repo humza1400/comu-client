@@ -18,7 +18,7 @@ public class Speed extends ToggleableModule{
 
     NumberProperty<Float> speed = new NumberProperty<Float>("speed", List.of(), 1f, 0f, 2f, 0.1f);
     public Speed() {
-        super("Speed", List.of(), Category.MOVEMENT, "You Go Zoooom");
+        super("Speed", List.of("swiftness"), Category.MOVEMENT, "You Go Zoooom");
         offerProperties(speed);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
@@ -37,11 +37,13 @@ public class Speed extends ToggleableModule{
     @Override
     public void onEnable() {
         super.onEnable();
+        if (isPlayerOrWorldNull(mc)) { return; }
         mc.options.getFovEffectScale().setValue(Math.min(1.0, Math.max(0.0, 0.0)));
     }
     @Override
     public void onDisable() {
         super.onDisable();
+        if (isPlayerOrWorldNull(mc)) return;
         EntityAttributeInstance attribute = mc.player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
         attribute.setBaseValue(0.1);
         mc.options.getFovEffectScale().setValue(Math.min(1.0, Math.max(0.0, 1.0)));

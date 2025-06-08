@@ -10,6 +10,7 @@ import me.comu.keybind.KeybindManager;
 import me.comu.module.Module;
 import me.comu.module.ModuleManager;
 import me.comu.render.HUDRenderer;
+import me.comu.rotation.RotationManager;
 import net.fabricmc.api.ClientModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -26,18 +27,18 @@ public class Comu implements ClientModInitializer {
     public static final Logger LOGGER = LoggerFactory.getLogger(CLIENT_NAME);
 
     private static Comu instance;
-    private long startTime;
 
     private IEventManager eventManager;
     private KeybindManager keybindManager;
     private ModuleManager moduleManager;
     private CommandManager commandManager;
     private ConfigManager configManager;
+    private RotationManager rotationManager;
 
     @Override
     public void onInitializeClient() {
         instance = this;
-        startTime = System.nanoTime() / 1000000L;
+        long startTime = System.nanoTime() / 1000000L;
 
         File configRoot = new File(FabricLoader.getInstance().getGameDir().toFile(), "comu");
         this.configManager = new ConfigManager(configRoot);
@@ -48,7 +49,7 @@ public class Comu implements ClientModInitializer {
         this.configManager.loadAll();
 
         // This will be deprecated because we don't use skid code, just here temporarily
-        MicrosoftLogin.setUserMicrosoft("","");
+        MicrosoftLogin.setUserMicrosoft("", "");
         Hook.init();
         HUDRenderer.init();
         LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
@@ -86,5 +87,9 @@ public class Comu implements ClientModInitializer {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public RotationManager getRotationManager() {
+        return rotationManager;
     }
 }

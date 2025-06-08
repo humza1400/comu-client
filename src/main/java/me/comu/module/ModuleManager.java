@@ -1,6 +1,7 @@
 package me.comu.module;
 
 import me.comu.api.registry.Registry;
+import me.comu.module.impl.combat.KillAura;
 import me.comu.module.impl.movement.Fly;
 import me.comu.module.impl.movement.Speed;
 import me.comu.module.impl.movement.Sprint;
@@ -18,9 +19,9 @@ public class ModuleManager extends Registry<Module> {
         // Active
 
         // Combat
+        register(new KillAura());
 
         // Exploits
-
 
         // Miscellaneous
 
@@ -39,11 +40,11 @@ public class ModuleManager extends Registry<Module> {
         return registry.stream()
                 .filter(module ->
                         module.getName().equalsIgnoreCase(name) ||
+                                module.getDisplayName().equalsIgnoreCase(name) ||
                                 module.getAliases().stream().anyMatch(alias -> alias.equalsIgnoreCase(name)))
                 .findFirst()
                 .orElse(null);
     }
-
 
     public List<Module> getModules() {
         return registry;
@@ -56,5 +57,23 @@ public class ModuleManager extends Registry<Module> {
                 .toList();
     }
 
+    public Module getConflictForRename(Module target, String newName) {
+        for (Module module : registry) {
+            if (module == target) continue;
+
+            boolean conflictsWithIdOrDisplayName =
+                    module.getName().equalsIgnoreCase(newName) ||
+                            module.getDisplayName().equalsIgnoreCase(newName);
+
+            boolean conflictsWithAlias =
+                    module.getAliases().stream().anyMatch(alias -> alias.equalsIgnoreCase(newName));
+
+            if (conflictsWithIdOrDisplayName || conflictsWithAlias) {
+                return module;
+            }
+        }
+
+        return null;
+    }
 
 }

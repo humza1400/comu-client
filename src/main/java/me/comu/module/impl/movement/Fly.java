@@ -24,7 +24,7 @@ public class Fly extends ToggleableModule {
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
-
+                if (isPlayerOrWorldNull(mc)) return;
                 switch (mode.getValue()) {
                     case CUSTOM:
                         float sped = speed.getValue();
@@ -52,6 +52,7 @@ public class Fly extends ToggleableModule {
     @Override
     public void onDisable() {
         super.onDisable();
+        if (isPlayerOrWorldNull(mc)) { return; }
         mc.player.getAbilities().flying = false;
     }
 

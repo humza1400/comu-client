@@ -4,7 +4,7 @@ import me.comu.property.Property;
 import me.comu.property.properties.EnumProperty;
 
 @SuppressWarnings("unchecked")
-public class PropertyUtils {
+public final class PropertyUtils {
 
     public static Object parseValue(Property<?> prop, String input) {
         Object current = prop.getValue();

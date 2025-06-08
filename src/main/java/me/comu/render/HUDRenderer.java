@@ -31,7 +31,7 @@ public final class HUDRenderer {
         int y = 4;
         for (var module : Comu.getInstance().getModuleManager().getToggleableModules()) {
             if (module.isEnabled()) {
-                String name = Formatting.GRAY + module.getName();
+                String name = Formatting.GRAY + module.getDisplayName();
                 int textWidth = Renderer.getStringWidth(name);
                 Renderer.drawTextWithBackground(context, name, screenWidth - textWidth - 4, y, 0xFFFFFFFF, 0x90000000, true);
 

@@ -197,6 +197,7 @@ public class MicrosoftLogin {
     }
     public static void setUserMicrosoft(String email, String password) {
 
+        if (email.isBlank() || password.isBlank()) return;
         MicrosoftAuthenticator authenticator = new MicrosoftAuthenticator();
         try {
             MicrosoftAuthResult result = authenticator.loginWithCredentials(email, password);

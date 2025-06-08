@@ -21,6 +21,8 @@ public class CommandManager extends Registry<Command> {
         register(new Prefix());
         register(new Module());
         register(new Modules());
+        register(new Rename());
+
         // Network
 
         // Player

@@ -42,6 +42,9 @@ public class ToggleableModule extends Module {
     }
 
     public void setEnabled(boolean enabled) {
+        if (this.enabled == enabled)
+            return;
+
         this.enabled = enabled;
         if (enabled) onEnable();
         else onDisable();

@@ -8,8 +8,6 @@ import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.BooleanProperty;
 import me.comu.property.properties.EnumProperty;
-import me.comu.property.properties.InputProperty;
-import me.comu.property.properties.NumberProperty;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.network.packet.c2s.play.ClientCommandC2SPacket;
 
@@ -19,16 +17,13 @@ public class Sprint extends ToggleableModule {
 
     BooleanProperty multiDir = new BooleanProperty("Multi-Directional", List.of("multi", "omni", "omnisprint", "multidir", "multidirectional", "multidirection"), true);
     BooleanProperty keepSprint = new BooleanProperty("Keep Sprint", List.of("keepsprint", "keepsprinting"), true);
-    NumberProperty<Integer> multiplier = new NumberProperty<>("multiplier", List.of(), 1, 0, 10, 1);
     EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VULCAN);
-    InputProperty testInputProperty = new InputProperty("Message", List.of("msg"), "This is a test input property");
 
     public enum Mode {VANILLA, VULCAN}
 
-
     public Sprint() {
         super("Sprint", List.of("autorun", "autosprint"), Category.MOVEMENT, "Automatically sprints for you");
-        offerProperties(multiDir, keepSprint, mode, multiplier, testInputProperty);
+        offerProperties(multiDir, keepSprint, mode);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {

@@ -38,10 +38,6 @@ public class MixinClientConnection {
 
                 }
             }
-
-
-
-
             return;
         }
 

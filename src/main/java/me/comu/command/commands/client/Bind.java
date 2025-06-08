@@ -44,7 +44,7 @@ public class Bind extends Command {
         int key = getKeyCodeByName(readableName);
 
         if (key == GLFW.GLFW_KEY_UNKNOWN) {
-            return "\247cInvalid key: " + keyName;
+            return "Invalid key: &c" + keyName;
         }
 
         if (keybind == null) {
