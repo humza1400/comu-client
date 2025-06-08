@@ -18,7 +18,7 @@
 ### Requirements
 - JDK 17+
 - Gradle (or use the Gradle wrapper)
-- IntelliJ IDEA (recommended) or VSCode
+- IntelliJ IDEA (recommended) or Eclipse
 
 ### Setup
 
