@@ -41,7 +41,7 @@ public class KillAura extends ToggleableModule {
     private float currentYaw, currentPitch;
 
     public KillAura() {
-        super("Kill Aura", List.of("killaura","aura", "ka"), Category.MOVEMENT, "Attacks any valid targets within reach");
+        super("Kill Aura", List.of("killaura","aura", "ka"), Category.COMBAT, "Attacks any valid targets within reach");
         offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override

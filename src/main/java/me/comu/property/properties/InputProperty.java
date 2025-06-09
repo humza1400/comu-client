@@ -17,6 +17,10 @@ public class InputProperty extends Property<String> {
         this.value += addition;
     }
 
+    public boolean isEmpty() {
+        return this.value == null || this.value.trim().isEmpty();
+    }
+
     public String getFormattedValue() {
         return "\"" + this.value + "\"";
     }

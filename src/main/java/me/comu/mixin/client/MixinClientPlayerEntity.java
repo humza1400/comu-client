@@ -1,10 +1,14 @@
 package me.comu.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import me.comu.Comu;
 import me.comu.events.MotionEvent;
+import me.comu.module.impl.movement.NoSlowdown;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.Perspective;
+import net.minecraft.entity.player.PlayerAbilities;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
 import org.spongepowered.asm.mixin.Mixin;
@@ -29,6 +33,7 @@ public abstract class MixinClientPlayerEntity {
 
     @Shadow protected abstract boolean isCamera();
     @Shadow protected abstract void sendSprintingPacket();
+
 
     @Inject(method = "sendMovementPackets", at = @At("HEAD"), cancellable = true)
     private void sendMovementPackets(CallbackInfo ci) {

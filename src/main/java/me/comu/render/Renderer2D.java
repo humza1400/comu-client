@@ -25,6 +25,10 @@ public final class Renderer2D {
         return textRenderer.getWidth(text);
     }
 
+    public static int getCharWidth(char c) {
+        return textRenderer.getWidth(String.valueOf(c));
+    }
+
     public static int getFontHeight() {
         return textRenderer.fontHeight;
     }

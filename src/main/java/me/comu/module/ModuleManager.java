@@ -2,9 +2,12 @@ package me.comu.module;
 
 import me.comu.api.registry.Registry;
 import me.comu.module.impl.combat.KillAura;
+import me.comu.module.impl.miscellaneous.ChatSpammer;
 import me.comu.module.impl.movement.*;
+import me.comu.module.impl.render.ClickGui;
 import me.comu.module.impl.render.HUD;
 import me.comu.module.impl.render.Nametags;
+import me.comu.module.impl.world.Timer;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -22,16 +25,19 @@ public class ModuleManager extends Registry<Module> {
         // Exploits
 
         // Miscellaneous
+        register(new ChatSpammer());
 
         // Movement
         register(new Sprint());
         register(new Speed());
         register(new Fly());
         register(new Velocity());
+        register(new NoSlowdown());
 
         // Render
         register(new HUD());
         register(new Nametags());
+        register(new ClickGui());
 
         // World
         register(new Timer());

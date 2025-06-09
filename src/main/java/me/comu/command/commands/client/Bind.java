@@ -7,6 +7,7 @@ import me.comu.command.CommandType;
 import me.comu.module.Module;
 import me.comu.module.ToggleableModule;
 import me.comu.keybind.Keybind;
+import me.comu.utils.ClientUtils;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
@@ -41,7 +42,7 @@ public class Bind extends Command {
         }
 
         String readableName = keyName.toUpperCase();
-        int key = getKeyCodeByName(readableName);
+        int key = ClientUtils.getKeyCodeByName(readableName);
 
         if (key == GLFW.GLFW_KEY_UNKNOWN) {
             return "Invalid key: &c" + keyName;
@@ -52,25 +53,6 @@ public class Bind extends Command {
         }
 
         keybind.setKey(key);
-        return String.format("\247e%s \2477has been bound to \247e%s\2477.", toggleableModule.getName(), getKeyName(key).toUpperCase());
-    }
-
-    private int getKeyCodeByName(String name) {
-        try {
-            return (int) GLFW.class.getField("GLFW_KEY_" + name).get(null);
-        } catch (Exception ignored) {
-            return GLFW.GLFW_KEY_UNKNOWN;
-        }
-    }
-
-    private String getKeyName(int keyCode) {
-        for (var field : GLFW.class.getFields()) {
-            try {
-                if (field.getName().startsWith("GLFW_KEY_") && (int) field.get(null) == keyCode) {
-                    return field.getName().replace("GLFW_KEY_", "");
-                }
-            } catch (Exception ignored) {}
-        }
-        return "UNKNOWN";
+        return String.format("\247e%s \2477has been bound to \247e%s\2477.", toggleableModule.getName(), ClientUtils.getKeyName(key).toUpperCase());
     }
 }

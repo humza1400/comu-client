@@ -2,7 +2,7 @@ package me.comu.mixin.minecraft;
 
 
 import me.comu.Comu;
-import me.comu.module.impl.movement.Timer;
+import me.comu.module.impl.world.Timer;
 import net.minecraft.client.render.RenderTickCounter;
 import org.objectweb.asm.Opcodes;
 import org.spongepowered.asm.mixin.Mixin;

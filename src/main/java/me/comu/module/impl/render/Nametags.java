@@ -1,17 +1,18 @@
 package me.comu.module.impl.render;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.events.Render2DEvent;
-import me.comu.logging.Logger;
 import me.comu.mixin.render.accessor.GameRendererAccessor;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
-import me.comu.module.impl.combat.KillAura;
 import me.comu.property.properties.BooleanProperty;
 import me.comu.property.properties.EnumProperty;
-import me.comu.property.properties.NumberProperty;
+import me.comu.utils.ClientUtils;
+import me.comu.utils.RenderUtils;
+import net.minecraft.client.gui.DrawContext;
+import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
 import net.minecraft.text.Text;
 import net.minecraft.util.Formatting;
@@ -19,7 +20,9 @@ import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 import org.joml.Vector4f;
 
+import java.util.ArrayList;
 import java.util.List;
+
 
 public class Nametags extends ToggleableModule {
 
@@ -33,6 +36,7 @@ public class Nametags extends ToggleableModule {
     BooleanProperty ping = new BooleanProperty("Ping", List.of("ping", "ms"), true);
     BooleanProperty lores = new BooleanProperty("Lore", List.of("lores", "l"), false);
     BooleanProperty invisibles = new BooleanProperty("Lore", List.of("lores", "l"), true);
+    BooleanProperty durability = new BooleanProperty("Durability", List.of("dur", "dura"), true);
 
     EnumProperty<HealthLook> healthLook = new EnumProperty<>("Health-Look", List.of("healthlook", "healthmode", "hlook", "mode", "m"), HealthLook.TEN);
 
@@ -42,7 +46,7 @@ public class Nametags extends ToggleableModule {
 
     public Nametags() {
         super("Nametags", List.of("tags", "nt", "nameplates"), Category.RENDER, "Renders nametags on players");
-        offerProperties(health, equipment, self, potions, distance, lores, invisibles, ping, healthLook, heart, hunger);
+        offerProperties(health, equipment, self, potions, distance, lores, invisibles, ping, healthLook, heart, hunger, durability);
         listeners.add(new Listener<>(Render2DEvent.class) {
             @Override
             public void call(Render2DEvent event) {
@@ -84,6 +88,9 @@ public class Nametags extends ToggleableModule {
                     );
 
                     event.getContext().drawText(mc.textRenderer, name, 0, 0, 0xFFAAAAAA, true);
+                    if (equipment.getValue()) {
+                        renderEquipmentRow(player, event.getContext(), textW, textH, scale);
+                    }
 
                     mats.pop();
                 }
@@ -123,6 +130,82 @@ public class Nametags extends ToggleableModule {
         double screenY = (1.0 - pos.y) / 2.0 * mc.getWindow().getFramebufferHeight();
 
         return new Vec3d(screenX, screenY, pos.z);
+    }
+
+    private void renderEquipmentRow(PlayerEntity player, DrawContext context, int textW, int textH, float scale) {
+        List<ItemStack> items = new ArrayList<>();
+
+        for (int i = 0; i <= 5; i++) {
+            ItemStack stack = getEquipmentItem(player, i);
+            if (!stack.isEmpty()) items.add(stack);
+        }
+
+        if (items.isEmpty()) return;
+
+        float iconSpacing = 18f;
+        float itemSize = 16f;
+        float totalWidth = items.size() * iconSpacing;
+
+        float startX = (textW - totalWidth) / 2f;
+
+        float yOffset = -itemSize - 4f;
+
+        for (int i = 0; i < items.size(); i++) {
+            ItemStack stack = items.get(i);
+            float x = startX + i * iconSpacing;
+
+            RenderUtils.drawItem(context, stack, (int) x, (int) yOffset, 1f, true);
+
+            if (durability.getValue() && stack.isDamageable()) {
+                context.getMatrices().push();
+
+                float scaleFactor = 0.40f;
+
+                int durability = stack.getMaxDamage() - stack.getDamage();
+                String durabilityText = String.valueOf(durability);
+                int textWidth = mc.textRenderer.getWidth(durabilityText);
+                int textHeight = mc.textRenderer.fontHeight;
+
+                float unscaledX = x + 16 - textWidth * scaleFactor - 1;
+                float unscaledY = yOffset + 16 - textHeight * scaleFactor - 2.8f;
+
+                context.getMatrices().translate(unscaledX, unscaledY, 9999);
+                context.getMatrices().scale(scaleFactor, scaleFactor, 1f);
+
+                context.drawText(mc.textRenderer, durabilityText, 0, 0, 0xFFFF9999, true);
+
+                context.getMatrices().pop();
+            }
+            List<String> enchants = ClientUtils.getShortenedEnchantments(stack);
+            if (!enchants.isEmpty()) {
+                context.getMatrices().push();
+
+                float scaleFactor = 0.45f;
+                context.getMatrices().translate(x, yOffset, 9999);
+                context.getMatrices().scale(scaleFactor, scaleFactor, 1f);
+
+                for (int j = 0; j < enchants.size(); j++) {
+                    String txt = enchants.get(j);
+                    context.drawText(mc.textRenderer, txt, 0, j * 8, 0xFFFFFFFF, true);
+                }
+
+                context.getMatrices().pop();
+            }
+
+        }
+    }
+
+
+    private ItemStack getEquipmentItem(PlayerEntity player, int index) {
+        return switch (index) {
+            case 0 -> player.getMainHandStack();
+            case 1 -> player.getEquippedStack(EquipmentSlot.HEAD);
+            case 2 -> player.getEquippedStack(EquipmentSlot.CHEST);
+            case 3 -> player.getEquippedStack(EquipmentSlot.LEGS);
+            case 4 -> player.getEquippedStack(EquipmentSlot.FEET);
+            case 5 -> player.getOffHandStack();
+            default -> ItemStack.EMPTY;
+        };
     }
 
 
@@ -176,7 +259,7 @@ public class Nametags extends ToggleableModule {
                 default -> health;
             };
 
-            String healthText = (health > 0 ? (int) displayHealth + (healthLook.getValue() == HealthLook.PERCENT ? "%" : "") : "dead");
+            String healthText = (health > 0 ? (int) displayHealth + (healthLook.getValue() == HealthLook.PERCENT ? "%" : "") : "Dead");
             name.append(Text.literal(" " + healthText).formatted(color));
 
             if (heart.getValue()) {
