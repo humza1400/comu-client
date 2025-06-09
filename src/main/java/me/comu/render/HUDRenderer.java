@@ -3,7 +3,6 @@ package me.comu.render;
 import me.comu.Comu;
 import me.comu.logging.Logger;
 import me.comu.module.impl.render.HUD;
-import me.comu.utils.Renderer;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -24,7 +23,7 @@ public final class HUDRenderer {
         HUD hud = (HUD) Comu.getInstance().getModuleManager().getModuleByName("HUD");
         if (hud == null || !hud.isEnabled()) return;
 
-        Renderer.drawTextWithBackground(context, Formatting.RED + Comu.getClientName() + Formatting.GRAY + " b" + Comu.getClientVersion(), 4, 4, 0xFFFFFFFF, 0x90000000, true);
+        Renderer2D.drawTextWithBackground(context, Formatting.RED + Comu.getClientName() + Formatting.GRAY + " b" + Comu.getClientVersion(), 4, 4, 0xFFFFFFFF, 0x90000000, true);
 
 
         int screenWidth = mc.getWindow().getScaledWidth();
@@ -32,10 +31,10 @@ public final class HUDRenderer {
         for (var module : Comu.getInstance().getModuleManager().getToggleableModules()) {
             if (module.isEnabled()) {
                 String name = Formatting.GRAY + module.getDisplayName();
-                int textWidth = Renderer.getStringWidth(name);
-                Renderer.drawTextWithBackground(context, name, screenWidth - textWidth - 4, y, 0xFFFFFFFF, 0x90000000, true);
+                int textWidth = Renderer2D.getStringWidth(name);
+                Renderer2D.drawTextWithBackground(context, name, screenWidth - textWidth - 4, y, 0xFFFFFFFF, 0x90000000, true);
 
-                y += Renderer.getFontHeight() + 2;
+                y += Renderer2D.getFontHeight() + 2;
             }
         }
     }

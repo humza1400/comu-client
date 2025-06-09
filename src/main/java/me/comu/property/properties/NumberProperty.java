@@ -4,6 +4,7 @@ import me.comu.property.Property;
 
 import java.util.List;
 
+@SuppressWarnings("unchecked")
 public class NumberProperty<T extends Number> extends Property<T> {
     private final T min;
     private final T max;

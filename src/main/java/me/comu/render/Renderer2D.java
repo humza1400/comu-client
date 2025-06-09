@@ -1,10 +1,10 @@
-package me.comu.utils;
+package me.comu.render;
 
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
-public final class Renderer {
+public final class Renderer2D {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static final TextRenderer textRenderer = mc.textRenderer;
 
@@ -29,5 +29,5 @@ public final class Renderer {
         return textRenderer.fontHeight;
     }
 
-    private Renderer() {}
+    private Renderer2D() {}
 }

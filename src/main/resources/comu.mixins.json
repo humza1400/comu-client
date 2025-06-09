@@ -7,7 +7,14 @@
 		"client.MixinClientConnection",
 		"entity.MixinPlayerEntity",
 		"io.MixinKeyboard",
-		"network.MixinClientPlayNetworkHandler"
+		"minecraft.MixinRenderTickCounterDynamic",
+		"minecraft.MinecraftClientAccessor",
+		"network.MixinClientPlayNetworkHandler",
+		"render.MixinEntityRenderer",
+		"render.MixinGameRenderer",
+		"render.MixinInGameHud",
+		"render.accessor.GameRendererAccessor",
+		"render.accessor.CameraAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

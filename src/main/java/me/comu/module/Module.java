@@ -3,6 +3,7 @@ package me.comu.module;
 import me.comu.Comu;
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.logging.Logger;
+import me.comu.mixin.minecraft.MinecraftClientAccessor;
 import me.comu.property.Property;
 import net.minecraft.client.MinecraftClient;
 
@@ -20,7 +21,8 @@ public abstract class Module {
 
     @SuppressWarnings("rawtypes")
     protected final List<Listener> listeners = new ArrayList<>();
-    protected MinecraftClient mc = MinecraftClient.getInstance();
+    protected final MinecraftClient mc = MinecraftClient.getInstance();
+    protected final MinecraftClientAccessor mcAccessor = (MinecraftClientAccessor) mc;
 
     public Module(String name, List<String> aliases, Category category, String description) {
         this.name = name;

@@ -41,7 +41,7 @@ public class KillAura extends ToggleableModule {
     private float currentYaw, currentPitch;
 
     public KillAura() {
-        super("Kill Aura", List.of("aura", "ka"), Category.MOVEMENT, "Automatically starts attacking any valid targets around you");
+        super("Kill Aura", List.of("killaura","aura", "ka"), Category.MOVEMENT, "Attacks any valid targets within reach");
         offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
@@ -193,7 +193,7 @@ public class KillAura extends ToggleableModule {
     }
 
     private double getGCD() {
-        double sensitivity = mc.options.getMouseSensitivity().getValue(); // Float value 0.0 - 1.0
+        double sensitivity = mc.options.getMouseSensitivity().getValue();
         double f = sensitivity * 0.6 + 0.2;
         return f * f * f * 8.0 * 0.15;
     }

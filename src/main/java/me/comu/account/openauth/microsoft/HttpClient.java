@@ -131,7 +131,7 @@ public class HttpClient
     {
         StringBuilder query = new StringBuilder();
         params.forEach((key, value) -> {
-            if (query.length() > 0) {
+            if (!query.isEmpty()) {
                 query.append('&');
             }
 
