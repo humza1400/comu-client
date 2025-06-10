@@ -2,6 +2,8 @@ package me.comu.mixin.render;
 
 import me.comu.Comu;
 import me.comu.events.Render2DEvent;
+import me.comu.module.impl.active.Overlay;
+import me.comu.property.properties.ListProperty;
 import me.comu.utils.RenderUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.hud.InGameHud;
@@ -23,5 +25,15 @@ public abstract class MixinInGameHud {
         context.draw();
         RenderUtils.scaledProjection();
         Profilers.get().pop();
+    }
+
+    @Inject(method = "renderStatusEffectOverlay", at = @At("HEAD"), cancellable = true)
+    private void onRenderStatusEffectOverlay(CallbackInfo ci) {
+        Overlay overlay = Comu.getInstance().getModuleManager().getModule(Overlay.class);
+        if (overlay != null) {
+            ListProperty noRender = (ListProperty) overlay.getPropertyByName("norender");
+            boolean shouldCancel = (boolean) noRender.getPropertyByName("vanillastatusicons").getValue();
+            if (shouldCancel) ci.cancel();
+        }
     }
 }

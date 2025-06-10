@@ -97,7 +97,8 @@ public class ComuModuleList {
             if (selectedCategory == null) {
                 shouldAdd = module instanceof ToggleableModule && ((ToggleableModule) module).isEnabled();
             } else {
-                shouldAdd = module instanceof ToggleableModule && module.getCategory() == selectedCategory;
+                if (selectedCategory == Category.PERSISTENT) shouldAdd = !(module instanceof ToggleableModule);
+                else shouldAdd = module instanceof ToggleableModule && module.getCategory() == selectedCategory;
             }
             if (!shouldAdd) continue;
 

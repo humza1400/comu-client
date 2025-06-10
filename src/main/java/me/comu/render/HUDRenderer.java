@@ -50,7 +50,7 @@ public final class HUDRenderer {
         if (hud.getArrayList().getValue()) {
             int y = 4;
             for (var module : Comu.getInstance().getModuleManager().getToggleableModules()) {
-                if (module.isEnabled()) {
+                if (module.isEnabled() && module.isDrawn()) {
                     String name = Formatting.GRAY + module.getDisplayName();
                     int textWidth = Renderer2D.getStringWidth(name);
                     Renderer2D.drawTextWithBackground(context, name, screenWidth - textWidth - 4, y, 0xFFFFFFFF, 0x90000000, true);

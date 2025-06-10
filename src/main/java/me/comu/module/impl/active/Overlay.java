@@ -10,8 +10,8 @@ import java.util.List;
 public class Overlay extends Module {
 
     BooleanProperty blockOverlay = new BooleanProperty("Block Overlay", List.of("blockoverlay", "blockpos"), true);
-    BooleanProperty noFire = new BooleanProperty("Fire Effect", List.of("fire", "fireeffect"), false);
-    BooleanProperty noVanillPotionHud = new BooleanProperty("Vanilla Potion Icons", List.of("vanillapotionicon", "vanillapotionicons", "vanillapotions", "vanillapotion", "vanillapots", "vanillapot", "poticons", "poticon", "potionicon", "potionicons"), true);
+    BooleanProperty noFire = new BooleanProperty("Fire Animation", List.of("fire", "fireeffect", "fireanimation"), false);
+    BooleanProperty noVanillPotionHud = new BooleanProperty("Potion Icons", List.of("vanillapotionicon", "vanillapotionicons", "vanillastatusicon","vanillastatusicons", "effecticon", "effecticons", "vanillapotions", "vanillapotion", "vanillapots", "vanillapot", "poticons", "poticon", "potionicon", "potionicons"), true);
 
     ListProperty noRender = new ListProperty("No Render", List.of("norender", "nr"), List.of(noFire, noVanillPotionHud));
 

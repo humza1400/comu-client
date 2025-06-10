@@ -5,6 +5,7 @@ import me.comu.api.registry.event.listener.Listener;
 import me.comu.logging.Logger;
 import me.comu.mixin.minecraft.MinecraftClientAccessor;
 import me.comu.property.Property;
+import me.comu.property.properties.ListProperty;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
@@ -47,11 +48,9 @@ public abstract class Module {
 
     public Property<?> getPropertyByName(String name) {
         for (Property<?> prop : properties) {
-            if (prop.getName().equalsIgnoreCase(name))
-                return prop;
+            if (prop.getName().equalsIgnoreCase(name)) return prop;
             for (String alias : prop.getAliases()) {
-                if (alias.equalsIgnoreCase(name))
-                    return prop;
+                if (alias.equalsIgnoreCase(name)) return prop;
             }
         }
         return null;
