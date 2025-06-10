@@ -95,7 +95,7 @@ public class ComuModuleList {
         for (me.comu.module.Module module : modules) {
             boolean shouldAdd;
             if (selectedCategory == null) {
-                shouldAdd = !(module instanceof ToggleableModule);
+                shouldAdd = module instanceof ToggleableModule && ((ToggleableModule) module).isEnabled();
             } else {
                 shouldAdd = module instanceof ToggleableModule && module.getCategory() == selectedCategory;
             }

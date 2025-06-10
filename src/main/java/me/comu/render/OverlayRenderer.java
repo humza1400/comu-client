@@ -3,18 +3,23 @@ package me.comu.render;
 import me.comu.Comu;
 import me.comu.logging.Logger;
 import me.comu.module.impl.render.HUD;
+import me.comu.module.impl.render.TabGui;
+import me.comu.module.impl.render.tabgui.TabGuiState;
+import me.comu.module.impl.render.tabgui.comu.ComuTabGui;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.RenderTickCounter;
 import net.minecraft.util.Formatting;
 
-public final class HUDRenderer {
+public final class OverlayRenderer {
 
     public static void init() {
         Logger.getLogger().print("Initializing HUD Renderer");
-        HudRenderCallback.EVENT.register(HUDRenderer::onRender);
+        HudRenderCallback.EVENT.register(OverlayRenderer::onRender);
     }
+
+    private static final ComuTabGui renderer = new ComuTabGui();
 
     private static void onRender(DrawContext context, RenderTickCounter tickCounter) {
         MinecraftClient mc = MinecraftClient.getInstance();
@@ -37,5 +42,12 @@ public final class HUDRenderer {
                 y += Renderer2D.getFontHeight() + 2;
             }
         }
+
+        TabGui tabGui = (TabGui) Comu.getInstance().getModuleManager().getModuleByName("TabGui");
+        if (tabGui != null && tabGui.isEnabled()) {
+            renderer.render(context, tabGui.getGuiState(), 3, 17);
+        }
     }
+
+
 }

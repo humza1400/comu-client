@@ -26,10 +26,10 @@ public class ComuSidebar {
 
     public void init(int startX, int startY, int width, int height, int spacing) {
         categoryPanels.clear();
+        categoryPanels.add(new ComuPanel(null, 0, 0, width, height));
         for (Category category : Category.values()) {
             categoryPanels.add(new ComuPanel(category, 0, 0, width, height));
         }
-        categoryPanels.add(new ComuPanel(null, 0, 0, width, height));
     }
 
     public void draw(DrawContext context, int mouseX, int mouseY) {

@@ -23,11 +23,11 @@ public enum Category {
         return name;
     }
 
-    List<Category> getAllCategories() {
+    public static List<Category> getAllCategories() {
         return Arrays.stream(Category.values()).toList();
     }
 
-    List<Category> getToggleCategories() {
+    public static List<Category> getToggleCategories() {
         return Arrays.stream(Category.values()).filter(category -> category.isToggleableCategory).toList();
     }
 }

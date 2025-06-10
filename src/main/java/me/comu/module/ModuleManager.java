@@ -7,6 +7,7 @@ import me.comu.module.impl.movement.*;
 import me.comu.module.impl.render.ClickGui;
 import me.comu.module.impl.render.HUD;
 import me.comu.module.impl.render.Nametags;
+import me.comu.module.impl.render.TabGui;
 import me.comu.module.impl.world.Timer;
 
 import java.util.List;
@@ -17,7 +18,7 @@ public class ModuleManager extends Registry<Module> {
     public ModuleManager() {
         registry = new CopyOnWriteArrayList<>();
 
-        // Active
+        // Persistent
 
         // Combat
         register(new KillAura());
@@ -39,6 +40,7 @@ public class ModuleManager extends Registry<Module> {
         register(new HUD());
         register(new Nametags());
         register(new ClickGui());
+        register(new TabGui());
 
         // World
         register(new Timer());
@@ -71,6 +73,14 @@ public class ModuleManager extends Registry<Module> {
                 .filter(module -> clazz.isAssignableFrom(module.getClass()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    public List<ToggleableModule> getModulesByCategory(Category category) {
+        return registry.stream()
+                .filter(module -> module instanceof ToggleableModule)
+                .map(module -> (ToggleableModule) module)
+                .filter(module -> module.getCategory() == category)
+                .toList();
     }
 
 

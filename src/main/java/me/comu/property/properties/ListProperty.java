@@ -11,6 +11,11 @@ public class ListProperty extends Property<List<Property<?>>> {
         super(name, aliases, new ArrayList<>(defaultValue)); // Defensive copy
     }
 
+    @Override
+    public String getName() {
+        return super.getName();
+    }
+
     public void add(Property<?> property) {
         value.add(property);
     }
