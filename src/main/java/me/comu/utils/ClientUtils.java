@@ -22,6 +22,8 @@ public class ClientUtils {
     private static final List<String> ENCHANTMENT_PRIORITY_LIST = List.of(
             "sharpness",
             "fire_aspect",
+            "knockback",
+            "looting",
             "efficiency",
             "silk_touch",
             "fortune",
@@ -115,9 +117,9 @@ public class ClientUtils {
         }
 
         enchList.sort(Comparator.comparingInt(ClientUtils.Triple::third));
-        for (int i = 0; i < Math.min(enchList.size(), 2); i++) {
-            String id = enchList.get(i).first();
-            int lvl = enchList.get(i).second();
+        for (Triple<String, Integer, Integer> stringIntegerIntegerTriple : enchList) {
+            String id = stringIntegerIntegerTriple.first();
+            int lvl = stringIntegerIntegerTriple.second();
             String shortName = switch (id) {
                 case "sharpness" -> "sh";
                 case "fire_aspect" -> "fa";
