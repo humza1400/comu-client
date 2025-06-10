@@ -340,9 +340,13 @@ public class ComuModule {
             PropertyContainer container = new PropertyContainer(listProp, paddingX, currentY, width - paddingX * 2);
             propertyContainers.add(container);
             currentY += container.getHeight();
-            currentY += 6;
+
+            if (i < listProps.size() - 1) {
+                currentY += 6;
+            }
         }
 
+        currentY += 8;
 
         this.height = Math.max(currentY + bottomPad, 25) - 5;
     }
@@ -399,6 +403,12 @@ public class ComuModule {
             if (input.mouseClicked(guiMouseX, guiMouseY, drawX, drawY, button)) return true;
         }
 
+        for (PropertyContainer container : propertyContainers) {
+            if (container.mouseClicked(guiMouseX, guiMouseY, drawX, drawY, button)) {
+                return true;
+            }
+        }
+
         return false;
     }
 
@@ -416,11 +426,19 @@ public class ComuModule {
         for (StringInput input : stringInputs) {
             input.keyTyped('\0', keyCode);
         }
+
+        for (PropertyContainer container : propertyContainers) {
+            container.handleKeyTyped('\0', keyCode);
+        }
     }
 
     public void handleCharTyped(char c) {
         for (StringInput input : stringInputs) {
             input.keyTyped(c, GLFW.GLFW_KEY_UNKNOWN);
+        }
+
+        for (PropertyContainer container : propertyContainers) {
+            container.handleKeyTyped(c, GLFW.GLFW_KEY_UNKNOWN);
         }
     }
 
@@ -432,6 +450,10 @@ public class ComuModule {
         for (ValueSlider slider : valueSliders) {
             slider.handleMouse(drawX, drawY, guiMouseX, guiMouseY);
         }
+
+        for (PropertyContainer container : propertyContainers) {
+            container.handleMouseDrag(drawX, drawY, guiMouseX, guiMouseY);
+        }
     }
 
     public List<EnumDropdown> getEnumDropdowns() {
@@ -442,7 +464,28 @@ public class ComuModule {
         return this.stringInputs;
     }
 
+    public List<StringInput> getAllStringInputs() {
+        List<StringInput> all = new ArrayList<>(stringInputs);
+        for (PropertyContainer container : propertyContainers) {
+            container.collectStringInputs(all);
+        }
+        return all;
+    }
+
+
     public void setHoverDisabled(boolean disabled) {
         this.hoverDisabled = disabled;
     }
+
+    public void collectExpandedDropdowns(List<EnumDropdown> list) {
+        for (EnumDropdown dropdown : enumDropdowns) {
+            if (dropdown.isExpanded()) {
+                list.add(dropdown);
+            }
+        }
+        for (PropertyContainer container : propertyContainers) {
+            container.collectExpandedDropdowns(list);
+        }
+    }
+
 }

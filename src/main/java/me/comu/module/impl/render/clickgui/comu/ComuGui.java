@@ -92,7 +92,7 @@ public class ComuGui extends Screen {
             isBackspaceHeld = false;
         }
 
-        moduleList.getModules().forEach(m -> m.getStringInputs().forEach(StringInput::tick));
+        moduleList.getModules().forEach(m -> m.getAllStringInputs().forEach(StringInput::tick));
         super.tick();
     }
 
@@ -220,15 +220,11 @@ public class ComuGui extends Screen {
 
     @Override
     public boolean keyPressed(int keyCode, int scanCode, int modifiers) {
-        boolean inputFocused = moduleList.getModules().stream().flatMap(m -> m.getStringInputs().stream()).anyMatch(StringInput::isFocused);
+        boolean inputFocused = moduleList.getModules().stream().flatMap(m -> m.getAllStringInputs().stream()).anyMatch(StringInput::isFocused);
         if ((modifiers & GLFW.GLFW_MOD_CONTROL) != 0) {
             if (keyCode == GLFW.GLFW_KEY_C) {
                 if (inputFocused) {
-                    moduleList.getModules().stream()
-                            .flatMap(m -> m.getStringInputs().stream())
-                            .filter(StringInput::isFocused)
-                            .findFirst()
-                            .ifPresent(input -> MinecraftClient.getInstance().keyboard.setClipboard(input.getValue()));
+                    moduleList.getModules().stream().flatMap(m -> m.getAllStringInputs().stream()).filter(StringInput::isFocused).findFirst().ifPresent(input -> MinecraftClient.getInstance().keyboard.setClipboard(input.getValue()));
                 } else if (searching) {
                     MinecraftClient.getInstance().keyboard.setClipboard(searchText);
                 }
@@ -238,11 +234,7 @@ public class ComuGui extends Screen {
             if (keyCode == GLFW.GLFW_KEY_V) {
                 String clipboard = MinecraftClient.getInstance().keyboard.getClipboard();
                 if (inputFocused) {
-                    moduleList.getModules().stream()
-                            .flatMap(m -> m.getStringInputs().stream())
-                            .filter(StringInput::isFocused)
-                            .findFirst()
-                            .ifPresent(input -> input.paste(clipboard));
+                    moduleList.getModules().stream().flatMap(m -> m.getAllStringInputs().stream()).filter(StringInput::isFocused).findFirst().ifPresent(input -> input.paste(clipboard));
                 } else if (searching) {
                     pasteToSearch(clipboard);
                 }
@@ -251,13 +243,11 @@ public class ComuGui extends Screen {
         }
 
         if (inputFocused && (keyCode == GLFW.GLFW_KEY_ESCAPE || keyCode == GLFW.GLFW_KEY_ENTER)) {
-            moduleList.getModules().forEach(m ->
-                    m.getStringInputs().forEach(input -> {
-                        if (input.isFocused()) {
-                            input.keyTyped('\0', keyCode);
-                        }
-                    })
-            );
+            moduleList.getModules().forEach(module -> module.getAllStringInputs().forEach(input -> {
+                if (input.isFocused()) {
+                    input.keyTyped('\0', keyCode);
+                }
+            }));
             return true;
         }
 
@@ -348,9 +338,15 @@ public class ComuGui extends Screen {
             return true;
         }
 
-        boolean inputFocused = moduleList.getModules().stream().flatMap(m -> m.getStringInputs().stream()).anyMatch(StringInput::isFocused);
+        boolean inputFocused = moduleList.getModules().stream().flatMap(m -> m.getAllStringInputs().stream()).anyMatch(StringInput::isFocused);
         if (inputFocused) {
-            moduleList.getModules().forEach(m -> m.handleCharTyped(chr));
+            moduleList.getModules().forEach(module -> {
+                for (StringInput input : module.getAllStringInputs()) {
+                    if (input.isFocused()) {
+                        input.keyTyped(chr, GLFW.GLFW_KEY_UNKNOWN);
+                    }
+                }
+            });
             return true;
         }
 

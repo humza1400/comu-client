@@ -5,10 +5,8 @@ import me.comu.render.Renderer2D;
 import me.comu.utils.RenderUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.util.math.MatrixStack;
-import org.lwjgl.opengl.GL11;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class EnumDropdown {
@@ -54,8 +52,7 @@ public class EnumDropdown {
         matrices.translate(0, 0, 1000);
 
         for (Enum<?> option : sortedValues) {
-            boolean hovered = mouseX >= dropdownX && mouseX <= dropdownX + dropdownWidth &&
-                    mouseY >= optionY && mouseY <= optionY + height;
+            boolean hovered = mouseX >= dropdownX && mouseX <= dropdownX + dropdownWidth && mouseY >= optionY && mouseY <= optionY + height;
 
             boolean isSelected = option == enumProperty.getValue();
             int backgroundColor;
@@ -68,10 +65,8 @@ public class EnumDropdown {
                 backgroundColor = 0xFF1E1E1E;
             }
 
-            // Draw background (at high Z)
             context.fill(dropdownX, optionY, dropdownX + dropdownWidth, optionY + height, backgroundColor);
 
-            // Draw option text
             matrices.push();
             matrices.translate(dropdownX + 3, optionY + 2, 0);
             matrices.scale(scale, scale, 1.0f);
@@ -98,12 +93,8 @@ public class EnumDropdown {
         int dropdownW = this.width;
         int dropdownH = sortedValues.size() * height;
 
-        return rectX < dropdownX + dropdownW &&
-                rectX + rectWidth > dropdownX &&
-                rectY < dropdownY + dropdownH &&
-                rectY + rectHeight > dropdownY;
+        return rectX < dropdownX + dropdownW && rectX + rectWidth > dropdownX && rectY < dropdownY + dropdownH && rectY + rectHeight > dropdownY;
     }
-
 
 
     public boolean wasClickConsumed(double mouseX, double mouseY, int button) {
@@ -203,7 +194,6 @@ public class EnumDropdown {
     }
 
 
-
     public int getHeight() {
         return expanded ? height + height * sortedValues.size() : height;
     }
@@ -257,6 +247,7 @@ public class EnumDropdown {
     public int getWidth() {
         return width;
     }
+
     public int getOptionCount() {
         return sortedValues.size();
     }
@@ -264,6 +255,4 @@ public class EnumDropdown {
     public int getOptionHeight() {
         return height;
     }
-
-
 }

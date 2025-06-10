@@ -10,6 +10,8 @@ import me.comu.keybind.Keybind;
 import me.comu.logging.Logger;
 import me.comu.module.Module;
 import me.comu.module.ToggleableModule;
+import me.comu.property.Property;
+import me.comu.property.properties.ListProperty;
 import me.comu.utils.PropertyUtils;
 
 import java.io.File;
@@ -49,7 +51,12 @@ public class ModulesConfig extends Config {
 
             JsonObject properties = new JsonObject();
             for (var property : module.getProperties()) {
-                properties.addProperty(property.getName(), PropertyUtils.serializeValue(property));
+                if (property instanceof ListProperty listProp) {
+                    JsonObject nested = serializeListProperty(listProp);
+                    properties.add(property.getName(), nested);
+                } else {
+                    properties.addProperty(property.getName(), PropertyUtils.serializeValue(property));
+                }
             }
             object.add("properties", properties);
 
@@ -105,11 +112,17 @@ public class ModulesConfig extends Config {
 
                     for (var property : module.getProperties()) {
                         if (!props.has(property.getName())) continue;
-                        String value = props.get(property.getName()).getAsString();
-                        Object parsed = PropertyUtils.parseValue(property, value);
-                        PropertyUtils.safelySet(property, parsed);
 
+                        if (property instanceof ListProperty listProp && props.get(property.getName()).isJsonObject()) {
+                            JsonObject nested = props.getAsJsonObject(property.getName());
+                            deserializeListProperty(listProp, nested);
+                        } else {
+                            String value = props.get(property.getName()).getAsString();
+                            Object parsed = PropertyUtils.parseValue(property, value);
+                            PropertyUtils.safelySet(property, parsed);
+                        }
                     }
+
                 }
             }
         } catch (Exception e) {
@@ -117,4 +130,31 @@ public class ModulesConfig extends Config {
             e.printStackTrace();
         }
     }
+
+    private JsonObject serializeListProperty(ListProperty listProp) {
+        JsonObject result = new JsonObject();
+        for (Property<?> subProp : listProp.getProperties()) {
+            if (subProp instanceof ListProperty nestedList) {
+                result.add(subProp.getName(), serializeListProperty(nestedList));
+            } else {
+                result.addProperty(subProp.getName(), PropertyUtils.serializeValue(subProp));
+            }
+        }
+        return result;
+    }
+
+    private void deserializeListProperty(ListProperty listProp, JsonObject json) {
+        for (Property<?> subProp : listProp.getProperties()) {
+            if (!json.has(subProp.getName())) continue;
+
+            if (subProp instanceof ListProperty nestedList && json.get(subProp.getName()).isJsonObject()) {
+                deserializeListProperty(nestedList, json.getAsJsonObject(subProp.getName()));
+            } else {
+                String value = json.get(subProp.getName()).getAsString();
+                Object parsed = PropertyUtils.parseValue(subProp, value);
+                PropertyUtils.safelySet(subProp, parsed);
+            }
+        }
+    }
+
 }

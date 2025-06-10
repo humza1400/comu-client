@@ -8,7 +8,6 @@ import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.sound.PositionedSoundInstance;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.sound.SoundEvents;
-import org.lwjgl.opengl.GL11;
 
 public class BooleanButton {
 
@@ -57,7 +56,7 @@ public class BooleanButton {
 
         MatrixStack matrices = context.getMatrices();
         matrices.push();
-        matrices.translate(boxX + boxSize + labelGap, boxY, 0);
+        matrices.translate(boxX + boxSize + labelGap, boxY + 1, 0);
         matrices.scale(scaleFactor, scaleFactor, 1f);
         Renderer2D.drawText(context, label, 0, 0, 0xFFFFFF, true);
         matrices.pop();
@@ -75,7 +74,6 @@ public class BooleanButton {
         return false;
     }
 
-
     public boolean isHovered(double mouseX, double mouseY, int parentX, int parentDrawY) {
         int boxX = parentX + x;
         int boxY = parentDrawY + y;
@@ -90,10 +88,5 @@ public class BooleanButton {
         int textHeight = (int) (Renderer2D.getFontHeight() * scaleFactor);
 
         return mouseX >= textX && mouseX < textX + textWidth && mouseY >= textY && mouseY < textY + textHeight;
-    }
-
-    public void setPosition(int x, int y) {
-        this.x = x;
-        this.y = y;
     }
 }

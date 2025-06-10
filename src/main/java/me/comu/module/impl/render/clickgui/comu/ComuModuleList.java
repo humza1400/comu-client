@@ -122,35 +122,23 @@ public class ComuModuleList {
     }
 
     public void draw(DrawContext context, int rawMouseX, int rawMouseY) {
-        MinecraftClient mc = MinecraftClient.getInstance();
-
-        int scaledHeight = mc.getWindow().getScaledHeight();
-        double scaleFactor = mc.getWindow().getScaleFactor();
-
-
         int guiMouseX = rawMouseX;
         int guiMouseY = rawMouseY;
 
         int totalContentHeight = getTotalContentHeight();
         int actualVisibleHeight = Math.min(MAX_VISIBLE_HEIGHT, totalContentHeight);
 
-        double pixelX = baseX * scaleFactor;
-        double pixelY = (scaledHeight - (baseY + actualVisibleHeight)) * scaleFactor;
-        double pixelW = maxWidth * scaleFactor;
-        double pixelH = actualVisibleHeight * scaleFactor;
+        int scissorX = baseX;
+        int scissorY = baseY;
+        int scissorW = maxWidth;
+        int scissorH = actualVisibleHeight;
 
-        GL11.glEnable(GL11.GL_SCISSOR_TEST);
-        GL11.glScissor((int) pixelX, (int) pixelY, (int) pixelW, (int) pixelH);
-
+        context.enableScissor(scissorX, scissorY, scissorX + scissorW, scissorY + scissorH);
 
         expandedDropdowns.clear();
 
         for (ComuModule module : moduleList) {
-            for (EnumDropdown dropdown : module.getEnumDropdowns()) {
-                if (dropdown.isExpanded()) {
-                    expandedDropdowns.add(dropdown);
-                }
-            }
+            module.collectExpandedDropdowns(expandedDropdowns);
         }
 
         boolean hoverDisabled = expandedDropdowns.stream().anyMatch(dropdown -> dropdown.isHovered(guiMouseX, guiMouseY));
@@ -164,13 +152,11 @@ public class ComuModuleList {
             module.handleMouseDrag(rawMouseX, rawMouseY, drawX, drawY);
         }
 
-
         for (EnumDropdown dropdown : expandedDropdowns) {
             dropdown.drawOnTop(context, guiMouseX, guiMouseY);
         }
 
-
-        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+        context.disableScissor();
 
         if (totalContentHeight > MAX_VISIBLE_HEIGHT) {
             int maxScroll = totalContentHeight - MAX_VISIBLE_HEIGHT;

@@ -33,7 +33,7 @@ public class StringInput {
         int drawX = px + x, drawY = py + y;
         if (drawY + height < top || drawY > bot) return;
 
-        int bgColor     = focused ? 0xFF2A2A3A : 0xFF1E1E1E;
+        int bgColor = focused ? 0xFF2A2A3A : 0xFF1E1E1E;
         int borderColor = 0xFF707070;
         ctx.fill(drawX, drawY, drawX + width, drawY + height, bgColor);
         ctx.fill(drawX, drawY, drawX + width, drawY + 1, borderColor);
@@ -126,8 +126,6 @@ public class StringInput {
     }
 
 
-
-
     public void tick() {
         long now = System.currentTimeMillis();
         if (now - lastCursorBlink > 500) {
@@ -137,11 +135,10 @@ public class StringInput {
     }
 
 
-
     public boolean mouseClicked(double mx, double my, double parentX, double parentY, int button) {
         if (button != 0) return false;
-        int drawX = (int)(parentX + x);
-        int drawY = (int)(parentY + y);
+        int drawX = (int) (parentX + x);
+        int drawY = (int) (parentY + y);
         boolean hit = mx >= drawX && mx < drawX + width && my >= drawY && my < drawY + height;
         focused = hit;
 
@@ -183,8 +180,7 @@ public class StringInput {
                 }
             }
             case GLFW.GLFW_KEY_A -> {
-                if ((GLFW.glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS) ||
-                        (GLFW.glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL) == GLFW.GLFW_PRESS)) {
+                if ((GLFW.glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_LEFT_CONTROL) == GLFW.GLFW_PRESS) || (GLFW.glfwGetKey(MinecraftClient.getInstance().getWindow().getHandle(), GLFW.GLFW_KEY_RIGHT_CONTROL) == GLFW.GLFW_PRESS)) {
                     cursorIndex = value.length();
                     selectedAll = true;
                 }
@@ -232,5 +228,4 @@ public class StringInput {
         }
         selectedAll = false;
     }
-
 }

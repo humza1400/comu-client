@@ -7,6 +7,7 @@ import me.comu.command.CommandType;
 import me.comu.property.Property;
 import me.comu.property.properties.BooleanProperty;
 import me.comu.property.properties.EnumProperty;
+import me.comu.property.properties.ListProperty;
 import me.comu.utils.PropertyUtils;
 import org.jetbrains.annotations.NotNull;
 
@@ -98,13 +99,42 @@ public class Module extends Command {
 
     private static @NotNull StringJoiner getFormattedPropertyList(me.comu.module.Module module) {
         StringJoiner joiner = new StringJoiner(", ");
-        for (Property<?> prop : module.getProperties()) {
-            String displayVal = PropertyUtils.getFormattedPropertyValue(prop);
-            joiner.add(String.format("&7%s&e[%s]&7", prop.getName(), displayVal));
 
-        }
+        module.getProperties().stream()
+                .sorted((a, b) -> {
+                    boolean aList = a instanceof ListProperty;
+                    boolean bList = b instanceof ListProperty;
+                    return Boolean.compare(aList, bList);
+                })
+                .forEach(prop -> appendProperty(joiner, prop, ""));
+
         return joiner;
     }
 
 
+    private static void appendProperty(StringJoiner joiner, Property<?> prop, String prefix) {
+//        if (prop instanceof ListProperty listProp) {
+//            String groupName = prefix.isEmpty() ? listProp.getName() : prefix + "." + listProp.getName();
+//
+//            StringJoiner groupJoiner = new StringJoiner(", ");
+//            for (Property<?> nested : listProp.getProperties()) {
+//                if (nested instanceof ListProperty) {
+//                    StringJoiner nestedGroupJoiner = new StringJoiner(", ");
+//                    appendProperty(nestedGroupJoiner, nested, "");
+//                    groupJoiner.add(nestedGroupJoiner.toString());
+//                } else {
+//                    String nestedName = nested.getName();
+//                    String value = PropertyUtils.getFormattedPropertyValue(nested);
+//                    groupJoiner.add(String.format("&7%s&e[%s]&7", nestedName, value));
+//                }
+//            }
+//
+//            joiner.add(String.format("&6%s: [&7%s&6]", groupName, groupJoiner));
+//        } else {
+//      // No point in showing list properties if we can't even change them through chat commands, looks ugly. Maybe add support later
+        if (prop instanceof ListProperty) return; {}
+            String fullName = prefix.isEmpty() ? prop.getName() : prefix + "." + prop.getName();
+            String displayVal = PropertyUtils.getFormattedPropertyValue(prop);
+            joiner.add(String.format("&7%s&e[%s]&7", fullName, displayVal));
+    }
 }
