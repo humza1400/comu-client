@@ -33,6 +33,7 @@ public class ModuleManager extends Registry<Module> {
         register(new Fly());
         register(new Velocity());
         register(new NoSlowdown());
+        register(new InventoryMove());
 
         // Render
         register(new HUD());

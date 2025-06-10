@@ -7,6 +7,7 @@
 		"client.MixinClientConnection",
 		"entity.MixinPlayerEntity",
 		"io.MixinKeyboard",
+		"io.MixinKeyboardInput",
 		"minecraft.MixinRenderTickCounterDynamic",
 		"minecraft.MinecraftClientAccessor",
 		"network.MixinClientPlayNetworkHandler",

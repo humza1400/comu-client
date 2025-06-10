@@ -16,7 +16,7 @@ import java.util.List;
 public class Sprint extends ToggleableModule {
 
     BooleanProperty multiDir = new BooleanProperty("Multi-Directional", List.of("multi", "omni", "omnisprint", "multidir", "multidirectional", "multidirection"), true);
-    BooleanProperty keepSprint = new BooleanProperty("Keep Sprint", List.of("keepsprint", "keepsprinting"), true);
+    BooleanProperty keepSprint = new BooleanProperty("Keep Sprint", List.of("keepsprint", "keepsprinting", "keep"), true);
     EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VULCAN);
 
     public enum Mode {VANILLA, VULCAN}

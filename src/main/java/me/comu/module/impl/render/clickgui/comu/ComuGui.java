@@ -51,12 +51,12 @@ public class ComuGui extends Screen {
     private long backspaceHoldStart = 0;
     private long lastBackspaceRepeat = 0;
     private int searchScrollOffset = 0;
-    private boolean shadersEnabled = false;
 
     private int frameIndex = 0;
     private long lastFrameTime = 0;
     private float gengarOffsetX = 2;
     private boolean gengarMovingRight = true;
+    private boolean hasInitializedPosition = false;
 
     private static final Identifier[] GENGAR_FRAMES = new Identifier[] {
             ClientUtils.identifier("textures/gengar/0.png"),
@@ -124,7 +124,7 @@ public class ComuGui extends Screen {
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
         super.render(context, mouseX, mouseY, deltaTicks);
-
+        ensureOnScreen();
 
         if (isDragging) {
             x = mouseX - dragOffsetX;
@@ -497,5 +497,27 @@ public class ComuGui extends Screen {
         );
 
         context.getMatrices().pop();
+    }
+
+    private void ensureOnScreen() {
+        int screenWidth = MinecraftClient.getInstance().getWindow().getScaledWidth();
+        int screenHeight = MinecraftClient.getInstance().getWindow().getScaledHeight();
+
+        int totalHeight = height + headerHeight + barHeight;
+
+        if (!hasInitializedPosition) {
+            x = (screenWidth - width) / 2;
+            y = (screenHeight - totalHeight) / 2 + headerHeight;
+            hasInitializedPosition = true;
+            return;
+        }
+
+        int minX = 0;
+        int maxX = screenWidth - width;
+        int minY = headerHeight + barHeight;
+        int maxY = screenHeight - height;
+
+        x = Math.max(minX, Math.min(x, maxX));
+        y = Math.max(minY, Math.min(y, maxY));
     }
 }
