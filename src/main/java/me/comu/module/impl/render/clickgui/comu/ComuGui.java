@@ -10,7 +10,9 @@ import me.comu.utils.ClientUtils;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
+import net.minecraft.client.render.RenderLayer;
 import net.minecraft.text.Text;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public class ComuGui extends Screen {
@@ -56,6 +58,29 @@ public class ComuGui extends Screen {
     private float gengarOffsetX = 2;
     private boolean gengarMovingRight = true;
 
+    private static final Identifier[] GENGAR_FRAMES = new Identifier[] {
+            ClientUtils.identifier("textures/gengar/0.png"),
+            ClientUtils.identifier( "textures/gengar/1.png"),
+            ClientUtils.identifier( "textures/gengar/2.png"),
+            ClientUtils.identifier( "textures/gengar/3.png"),
+            ClientUtils.identifier( "textures/gengar/4.png"),
+            ClientUtils.identifier( "textures/gengar/5.png"),
+            ClientUtils.identifier( "textures/gengar/6.png"),
+            ClientUtils.identifier( "textures/gengar/7.png"),
+            ClientUtils.identifier( "textures/gengar/8.png"),
+            ClientUtils.identifier( "textures/gengar/9.png"),
+            ClientUtils.identifier( "textures/gengar/10.png"),
+            ClientUtils.identifier( "textures/gengar/11.png"),
+            ClientUtils.identifier( "textures/gengar/12.png"),
+            ClientUtils.identifier( "textures/gengar/13.png"),
+            ClientUtils.identifier( "textures/gengar/14.png"),
+            ClientUtils.identifier( "textures/gengar/15.png"),
+            ClientUtils.identifier( "textures/gengar/16.png"),
+            ClientUtils.identifier( "textures/gengar/17.png"),
+            ClientUtils.identifier( "textures/gengar/18.png"),
+            ClientUtils.identifier( "textures/gengar/19.png"),
+    };
+
     public ComuGui() {
         super(Text.literal("comu"));
     }
@@ -98,8 +123,8 @@ public class ComuGui extends Screen {
 
     @Override
     public void render(DrawContext context, int mouseX, int mouseY, float deltaTicks) {
+        super.render(context, mouseX, mouseY, deltaTicks);
 
-        this.renderBackground(context, mouseX, mouseY, deltaTicks);
 
         if (isDragging) {
             x = mouseX - dragOffsetX;
@@ -129,7 +154,7 @@ public class ComuGui extends Screen {
                 gengarOffsetX -= 0.3f;
                 if (gengarOffsetX <= 4) gengarMovingRight = true;
             }
-//            drawGengar(context, imageX + (int) gengarOffsetX, imageY + 12);
+            drawGengar(context, imageX + (int) gengarOffsetX, imageY + 12);
         }
 
         String title = Comu.getClientName();
@@ -163,7 +188,6 @@ public class ComuGui extends Screen {
         sidebar.draw(context, mouseX, mouseY);
 //        context.fill(x + 5 + sidebarWidth + 1, y + 8, x + 5 + sidebarWidth + 2, y + height - 8, 0x4DCCCCCC);
         moduleList.draw(context, mouseX, mouseY);
-        super.render(context, mouseX, mouseY, deltaTicks);
     }
 
     @Override
@@ -444,4 +468,34 @@ public class ComuGui extends Screen {
         searchSelectedAll = false;
     }
 
+    private void drawGengar(DrawContext context, int x, int y) {
+        long now = System.currentTimeMillis();
+        if (now - lastFrameTime > 100) {
+            frameIndex = (frameIndex + 1) % GENGAR_FRAMES.length;
+            lastFrameTime = now;
+        }
+
+        Identifier frame = GENGAR_FRAMES[frameIndex];
+
+        int texWidth = 500;
+        int texHeight = 493;
+
+        float scaleX = 50f / texWidth;
+        float scaleY = 18f / texHeight;
+
+        context.getMatrices().push();
+        context.getMatrices().translate(x, y, 0);
+        context.getMatrices().scale(scaleX, scaleY, 1.0f);
+
+        context.drawTexture(
+                RenderLayer::getGuiTextured,
+                frame,
+                0, 0,
+                0, 0,
+                texWidth, texHeight,
+                texWidth, texHeight
+        );
+
+        context.getMatrices().pop();
+    }
 }

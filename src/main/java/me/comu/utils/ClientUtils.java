@@ -1,5 +1,6 @@
 package me.comu.utils;
 
+import me.comu.Comu;
 import me.comu.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
@@ -8,6 +9,7 @@ import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import org.lwjgl.glfw.GLFW;
 
@@ -170,5 +172,9 @@ public class ClientUtils {
             lines.add(shortName + lvl);
         }
         return lines;
+    }
+
+    public static Identifier identifier(String path) {
+        return Identifier.of(Comu.getClientName(), path);
     }
 }
