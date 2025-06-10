@@ -136,7 +136,7 @@ public class Nametags extends ToggleableModule {
         List<ItemStack> items = new ArrayList<>();
 
         for (int i = 0; i <= 5; i++) {
-            ItemStack stack = getEquipmentItem(player, i);
+            ItemStack stack = ClientUtils.getEquipmentItem(player, i);
             if (!stack.isEmpty()) items.add(stack);
         }
 
@@ -194,20 +194,6 @@ public class Nametags extends ToggleableModule {
 
         }
     }
-
-
-    private ItemStack getEquipmentItem(PlayerEntity player, int index) {
-        return switch (index) {
-            case 0 -> player.getMainHandStack();
-            case 1 -> player.getEquippedStack(EquipmentSlot.HEAD);
-            case 2 -> player.getEquippedStack(EquipmentSlot.CHEST);
-            case 3 -> player.getEquippedStack(EquipmentSlot.LEGS);
-            case 4 -> player.getEquippedStack(EquipmentSlot.FEET);
-            case 5 -> player.getOffHandStack();
-            default -> ItemStack.EMPTY;
-        };
-    }
-
 
     private Text getDisplayName(PlayerEntity player) {
         MutableText name = player.getDisplayName().copy();

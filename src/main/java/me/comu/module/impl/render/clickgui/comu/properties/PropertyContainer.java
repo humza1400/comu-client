@@ -37,7 +37,7 @@ public class PropertyContainer {
         inputs.clear();
         nestedContainers.clear();
 
-        int offsetY = y + 12;
+        int offsetY = y + 18;
         int gapBetween = 6;
 
         List<Property<?>> props = listProperty.getProperties();
@@ -54,7 +54,7 @@ public class PropertyContainer {
                 offsetY += 12;
             } else if (prop instanceof EnumProperty<?> enumProp) {
                 dropdowns.add(new EnumDropdown(enumProp, x + padding, offsetY, width - padding * 2, 12));
-                offsetY += 22;
+                offsetY += 16;
             } else if (prop instanceof InputProperty inputProp) {
                 inputs.add(new StringInput(inputProp, x + padding, offsetY, width - padding * 2, 12));
                 offsetY += 16;

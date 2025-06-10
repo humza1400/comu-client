@@ -1,6 +1,7 @@
 package me.comu.module;
 
 import me.comu.api.registry.Registry;
+import me.comu.module.impl.active.Overlay;
 import me.comu.module.impl.combat.KillAura;
 import me.comu.module.impl.miscellaneous.ChatSpammer;
 import me.comu.module.impl.movement.*;
@@ -19,6 +20,7 @@ public class ModuleManager extends Registry<Module> {
         registry = new CopyOnWriteArrayList<>();
 
         // Persistent
+        register(new Overlay());
 
         // Combat
         register(new KillAura());

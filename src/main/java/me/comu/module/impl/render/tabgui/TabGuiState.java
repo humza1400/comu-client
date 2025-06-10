@@ -28,7 +28,6 @@ public class TabGuiState {
     public float listPropertyTransition = 0f;
     public float targetListPropertyTransition = 0f;
 
-
     public List<Category> categories = Category.getToggleCategories();
     public ListProperty currentList = null;
     public List<Property<?>> currentListProperties = List.of();

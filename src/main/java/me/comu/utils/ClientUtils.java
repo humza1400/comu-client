@@ -6,6 +6,8 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
 import net.minecraft.registry.entry.RegistryEntry;
@@ -172,6 +174,18 @@ public class ClientUtils {
             lines.add(shortName + lvl);
         }
         return lines;
+    }
+
+    public static ItemStack getEquipmentItem(PlayerEntity player, int index) {
+        return switch (index) {
+            case 0 -> player.getMainHandStack();
+            case 1 -> player.getEquippedStack(EquipmentSlot.HEAD);
+            case 2 -> player.getEquippedStack(EquipmentSlot.CHEST);
+            case 3 -> player.getEquippedStack(EquipmentSlot.LEGS);
+            case 4 -> player.getEquippedStack(EquipmentSlot.FEET);
+            case 5 -> player.getOffHandStack();
+            default -> ItemStack.EMPTY;
+        };
     }
 
     public static Identifier identifier(String path) {

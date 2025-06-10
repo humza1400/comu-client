@@ -5,6 +5,7 @@ import me.comu.module.ToggleableModule;
 import me.comu.module.impl.render.tabgui.TabGuiRenderer;
 import me.comu.module.impl.render.tabgui.TabGuiState;
 import me.comu.property.Property;
+import me.comu.property.properties.EnumProperty;
 import me.comu.property.properties.InputProperty;
 import me.comu.property.properties.ListProperty;
 import net.minecraft.client.MinecraftClient;
@@ -42,7 +43,7 @@ public class ComuTabGui implements TabGuiRenderer {
 
         int maxCategoryWidth = state.categories.stream().mapToInt(cat -> mc.textRenderer.getWidth(cat.getName())).max().orElse(60);
         int categoryBoxWidth = maxCategoryWidth + 6;
-        int categoryBoxHeight = state.categories.size() * itemHeight + topPadding - 1;
+        int categoryBoxHeight = state.categories.size() * itemHeight + topPadding;
 
         context.fill((int) scaledX, (int) scaledY, (int) (scaledX + categoryBoxWidth), (int) (scaledY + categoryBoxHeight), bgColor);
         context.drawBorder((int) scaledX, (int) scaledY, categoryBoxWidth, categoryBoxHeight, outlineColor);
@@ -54,7 +55,8 @@ public class ComuTabGui implements TabGuiRenderer {
 
             if (selected) {
                 float selectorY = scaledY + topPadding + state.categoryTransition;
-                context.fill((int) scaledX + 1, (int) selectorY, (int) (scaledX + categoryBoxWidth) - 1, (int) (selectorY + itemHeight - 1), selectedBg);
+                int selectorTop = Math.round(selectorY);
+                context.fill((int) scaledX + 1, selectorTop, (int) (scaledX + categoryBoxWidth) - 1, selectorTop + itemHeight - 1, selectedBg);
             }
 
             context.drawText(mc.textRenderer, state.categories.get(i).getName(), (int) (scaledX + 2), drawY, 0xFFFFFFFF, true);
@@ -66,7 +68,6 @@ public class ComuTabGui implements TabGuiRenderer {
             int maxModuleWidth = modules.stream().mapToInt(mod -> mc.textRenderer.getWidth(mod.getDisplayName())).max().orElse(60);
             int moduleBoxWidth = maxModuleWidth + 6;
             int moduleBoxHeight = modules.size() * itemHeight + topPadding;
-            if (modules.size() > 1) moduleBoxHeight--;
 
             int moduleX = (int) (scaledX + categoryBoxWidth + gapPadding);
 
@@ -80,7 +81,8 @@ public class ComuTabGui implements TabGuiRenderer {
 
                 if (selected) {
                     float selectorY = scaledY + topPadding + state.moduleTransition;
-                    context.fill(moduleX + 1, (int) selectorY, moduleX + moduleBoxWidth - 1, (int) (selectorY + itemHeight - 1), selectedBg);
+                    int selectorTop = Math.round(selectorY);
+                    context.fill(moduleX + 1, selectorTop, moduleX + moduleBoxWidth - 1, selectorTop + itemHeight - 1, selectedBg);
                 }
 
                 ToggleableModule mod = modules.get(i);
@@ -98,7 +100,6 @@ public class ComuTabGui implements TabGuiRenderer {
 
                 int propBoxWidth = maxPropWidth + 6;
                 int propBoxHeight = properties.size() * itemHeight + topPadding;
-                if (properties.size() > 1) propBoxHeight--;
                 int propX = moduleX + moduleBoxWidth + gapPadding;
 
                 context.fill(propX, (int) scaledY, propX + propBoxWidth, (int) (scaledY + propBoxHeight), bgColor);
@@ -111,12 +112,19 @@ public class ComuTabGui implements TabGuiRenderer {
 
                     if (selected) {
                         float selectorY = scaledY + topPadding + state.propertyTransition;
-                        context.fill(propX + 1, (int) selectorY, propX + propBoxWidth - 1, (int) (selectorY + itemHeight - 1), selectedBg);
+                        int selectorTop = Math.round(selectorY);
+                        context.fill(propX + 1, selectorTop, propX + propBoxWidth - 1, selectorTop + itemHeight - 1, selectedBg);
                     }
 
                     Property<?> prop = properties.get(i);
                     String propName = prop.getName();
-                    String value = (prop instanceof ListProperty) ? "" : ": " + prop.getValue();
+                    String value = "";
+                    if (!(prop instanceof ListProperty)) {
+                        if (prop instanceof EnumProperty<?> enumProp)
+                            value = ": " + enumProp.getFormattedValue();
+                        else
+                            value = ": " + prop.getValue();
+                    }
 
                     int nameWidth = mc.textRenderer.getWidth(propName);
                     int nameColor = selected && (state.inPropertyFocus || state.insideListProperty) ? propertyFocusColor : 0xFFFFFFFF;
@@ -135,7 +143,6 @@ public class ComuTabGui implements TabGuiRenderer {
                     }).max().orElse(60);
                     int listPropBoxWidth = maxListPropWidth + 6;
                     int listPropBoxHeight = listProps.size() * itemHeight + topPadding;
-                    if (listProps.size() > 1) listPropBoxHeight--;
                     int listPropX = propX + propBoxWidth + gapPadding;
 
                     context.fill(listPropX, (int) scaledY, listPropX + listPropBoxWidth, (int) (scaledY + listPropBoxHeight), bgColor);
@@ -148,12 +155,20 @@ public class ComuTabGui implements TabGuiRenderer {
 
                         if (selected) {
                             float selectorY = scaledY + topPadding + state.listPropertyTransition;
-                            context.fill(listPropX + 1, (int) selectorY, listPropX + listPropBoxWidth - 1, (int) (selectorY + itemHeight - 1), selectedBg);
+                            int selectorTop = Math.round(selectorY);
+                            context.fill(listPropX + 1, selectorTop, listPropX + listPropBoxWidth - 1, selectorTop + itemHeight - 1, selectedBg);
                         }
 
                         Property<?> prop = listProps.get(i);
                         String propName = prop.getName();
-                        String value = (prop instanceof ListProperty) ? "" : ": " + prop.getValue();
+                        String value = "";
+                        if (!(prop instanceof ListProperty)) {
+                            if (prop instanceof EnumProperty<?> enumProp)
+                                value = ": " + enumProp.getFormattedValue();
+                            else
+                                value = ": " + prop.getValue();
+                        }
+
 
                         int nameWidth = mc.textRenderer.getWidth(propName);
                         int nameColor = selected && state.inPropertyFocus ? propertyFocusColor : 0xFFFFFFFF;

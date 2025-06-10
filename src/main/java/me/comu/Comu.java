@@ -8,7 +8,7 @@ import me.comu.config.ConfigManager;
 import me.comu.hooks.Hook;
 import me.comu.keybind.KeybindManager;
 import me.comu.module.ModuleManager;
-import me.comu.render.OverlayRenderer;
+import me.comu.render.HUDRenderer;
 import me.comu.rotation.RotationManager;
 import net.fabricmc.api.ClientModInitializer;
 
@@ -48,9 +48,9 @@ public class Comu implements ClientModInitializer {
         this.configManager.loadAll();
 
         // This will be deprecated because we don't use skid code, just here temporarily
-        MicrosoftLogin.setUserMicrosoft("", "");
+//        MicrosoftLogin.setUserMicrosoft("", "");
         Hook.init();
-        OverlayRenderer.init();
+        HUDRenderer.init();
         LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
 
         ClientLifecycleEvents.CLIENT_STOPPING.register(client -> Comu.getInstance().getConfigManager().saveAll());

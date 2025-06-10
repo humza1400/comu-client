@@ -51,11 +51,12 @@ public class StringInput {
         String fullRawText = property.getValue();
         String displayText = fullRawText;
         int textX = drawX + 2;
-        int textY = drawY + (height - Renderer2D.getFontHeight()) / 2;
+        int textY = drawY + (height - Renderer2D.getFontHeight()) / 2 + 2;
         int innerWidth = width - 8;
 
         ms.push();
         ms.translate(textX, textY, 0);
+        ms.scale(0.8f, 0.8f, 1f);
 
         int gray = 0xFF888888;
         int white = 0xFFFFFFFF;

@@ -7,45 +7,84 @@ import me.comu.property.properties.*;
 import java.util.List;
 
 public class HUD extends ToggleableModule {
-    BooleanProperty mobs = new BooleanProperty("Monsters", List.of("mobs", "mob", "zombie", "zombies", "skeleton", "skeletons"), true);
-    BooleanProperty passives = new BooleanProperty("Passives", List.of("passive", "villager", "villagers", "neutral", "neutrals", "animal", "cow", "cows", "sheep"), true);
-    BooleanProperty players = new BooleanProperty("Players", List.of("player", "people"), true);
-    BooleanProperty rayTrace = new BooleanProperty("Ray-Trace", List.of("raytrace", "rayt", "ray", "rt"), true);
-    BooleanProperty cooldownAttack = new BooleanProperty("Cooldown", List.of("1.9pvp", "19pvp", "1.9", "19", "cd"), false);
 
-    NumberProperty<Float> range = new NumberProperty<>("Reach", List.of("range", "r"), 4f, 3f, 6f, 0.1f);
-    NumberProperty<Integer> aps = new NumberProperty<>("APS", List.of("speed", "cps"), 10, 1, 20, 1);
-    NumberProperty<Integer> fov = new NumberProperty<>("FOV", List.of(), 180, 1, 180, 30);
-    BooleanProperty showCoords = new BooleanProperty("Show Coords", List.of("coords"), true);
-    NumberProperty<Double> scale = new NumberProperty<>("Scale", List.of("scaling"), 1.0d, 0.5d, 2.0d, 0.1d);
-    EnumProperty<Alignment> alignment = new EnumProperty<>("Alignment", List.of("align"), Alignment.LEFT);
-    InputProperty name = new InputProperty("Custom Name", List.of("tag"), "ComuClient");
+    private final BooleanProperty potions = new BooleanProperty("Potions", List.of("potion", "pot", "pots"), true);
+    private final BooleanProperty coords = new BooleanProperty("Coords", List.of("coordinate", "coordinates", "coord", "xyz"), true);
+    private final BooleanProperty clock = new BooleanProperty("Clock", List.of("time"), true);
+    private final BooleanProperty fps = new BooleanProperty("FPS", List.of("raytrace", "rayt", "ray", "rt"), true);
+    private final BooleanProperty ping = new BooleanProperty("Ping", List.of("ms"), true);
+    private final BooleanProperty direction = new BooleanProperty("Direction", List.of("facing"), true);
+    private final BooleanProperty gapple = new BooleanProperty("Gapple", List.of("gappletimer"), true);
+    private final BooleanProperty watermark = new BooleanProperty("Watermark", List.of("title"), true);
+    private final BooleanProperty arrayList = new BooleanProperty("Array List", List.of("arraylist"), true);
+    private final BooleanProperty armor = new BooleanProperty("Armor", List.of(), true);
+    private final BooleanProperty bps = new BooleanProperty("BPS", List.of("blockspersec","blockspersecond"), true);
+    private final BooleanProperty tps = new BooleanProperty("TPS", List.of(""), true);
 
-    ListProperty nested = new ListProperty("Advanced Settings", List.of("advanced"), List.of(
-            new BooleanProperty("Show Background", List.of("bg"), true),
-            new NumberProperty<Float>("Background Alpha", List.of("alpha"), 0.8f, 0.0f, 1.0f, 1.0f),
-            new EnumProperty<>( "Color Mode", List.of("colormode"), ColorMode.RAINBOW)
-    ));
+    private final EnumProperty<ArrayListPosition> arrayListPosition = new EnumProperty<>("Position", List.of("arraylistposition"), ArrayListPosition.TOPRIGHT);
+    private final EnumProperty<ArrayListTheme> arrayListTheme = new EnumProperty<>("Theme", List.of("arraylisttheme"), ArrayListTheme.COMU);
+    private final EnumProperty<ArrayListSort> arrayListSort = new EnumProperty<>("Sort", List.of("arraylistsort"), ArrayListSort.LONGEST);
+    private final EnumProperty<ArrayListCase> arrayListCase = new EnumProperty<>("Casing", List.of("arraylistcase", "arraylistcasing"), ArrayListCase.DEFAULT);
+    private final ListProperty arrayListOptions = new ListProperty("Array List Options", List.of("arraylistoption", "arrayoptions", "arrayoption", "arraylistoptions"), List.of(arrayListPosition, arrayListTheme, arrayListSort, arrayListCase));
 
-    public enum Alignment {
-        LEFT, CENTER, RIGHT
+    public enum ArrayListPosition {
+        TOPLEFT, TOPRIGHT
     }
 
-    public enum ColorMode {
-        STATIC, RAINBOW, PULSE
+    public enum ArrayListTheme {
+        INDIGO, COMU, GRAYSCALE, WHITE, RAINBOW
     }
 
-    // Main ListProperty
-    ListProperty settings = new ListProperty("HUD Settings", List.of("hudsettings"), List.of(
-            showCoords,
-            scale,
-            alignment,
-            name,
-            nested
-    ));
+    public enum ArrayListSort {
+        ABC, LONGEST, SHORTEST
+    }
+
+    public enum ArrayListCase {
+        CUB, DEFAULT, LOWER, UPPER
+    }
 
     public HUD() {
         super("HUD", List.of("textgui"), Category.RENDER, "Shows the client overlay and visual components");
-        offerProperties(settings, nested, range, aps, fov, mobs, passives, players, rayTrace, cooldownAttack);
+        offerProperties(potions, coords, clock, fps, ping, direction, gapple, watermark, arrayList, arrayListOptions, armor);
+    }
+
+    public BooleanProperty getPotions() {
+        return potions;
+    }
+
+    public BooleanProperty getCoords() {
+        return coords;
+    }
+
+    public BooleanProperty getClock() {
+        return clock;
+    }
+
+    public BooleanProperty getFps() {
+        return fps;
+    }
+
+    public BooleanProperty getPing() {
+        return ping;
+    }
+
+    public BooleanProperty getDirection() {
+        return direction;
+    }
+
+    public BooleanProperty getGapple() {
+        return gapple;
+    }
+
+    public BooleanProperty getWatermark() {
+        return watermark;
+    }
+
+    public BooleanProperty getArrayList() {
+        return arrayList;
+    }
+
+    public BooleanProperty getArmor() {
+        return armor;
     }
 }

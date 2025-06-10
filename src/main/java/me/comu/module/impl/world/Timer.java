@@ -8,7 +8,7 @@ import java.util.List;
 
 public class Timer extends ToggleableModule {
 
-    NumberProperty<Float> timer = new NumberProperty<>("Timer", List.of("speed", "t", "s", "timerspeed"), 1.0f, 0.1f, 10.0f, 0.25f);
+    NumberProperty<Float> timer = new NumberProperty<>("Multiplier", List.of("speed", "t", "s", "timerspeed", "timer"), 1.0f, 0.1f, 10.0f, 0.25f);
 
     public Timer() {
         super("Timer", List.of("timerspeed"), Category.WORLD, "Speeds up everything in the game");

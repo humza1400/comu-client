@@ -91,7 +91,7 @@ public class ComuModule {
         if (hoveringName) {
             String description = module.getDescription();
             if (description != null && !description.isEmpty()) {
-                float tooltipScale = 0.6f;
+                float tooltipScale = 0.70f;
 
                 int textW = Renderer2D.getStringWidth(description);
                 int textH = Renderer2D.getFontHeight();
@@ -185,7 +185,7 @@ public class ComuModule {
                 context.fill(textX - pad, textY - pad, textX + txtW + pad, textY + txtH + pad, 0x30FFFFFF);
 
                 if (shouldShowTooltip && !isTooltipObstructed(tooltipX, tooltipY, tooltipW, tooltipH, expandedDropdowns)) {
-                    float tooltipScale = 0.6f;
+                    float tooltipScale = 0.70f;
                     String tooltipText = "[" + fullKey + "]";
 
                     MatrixStack matrices = context.getMatrices();
@@ -293,27 +293,32 @@ public class ComuModule {
             if (prop instanceof NumberProperty) {
                 ValueSlider slider = new ValueSlider((NumberProperty) prop, paddingX, currentY, width - paddingX * 2, 8);
                 valueSliders.add(slider);
-                currentY += 14;
+                currentY += 16;
                 renderedSlider = true;
             }
         }
 
         if (renderedSlider && hasEnums) {
-            currentY += 4;
+            currentY += 2;
         }
 
         for (Property<?> prop : module.getProperties()) {
             if (prop instanceof EnumProperty) {
                 EnumDropdown dropdown = new EnumDropdown((EnumProperty<?>) prop, paddingX, currentY, width - paddingX * 2, 12);
                 enumDropdowns.add(dropdown);
-                currentY += 22;
+                currentY += 24;
             }
         }
 
         boolean anyAbove = !booleanButtons.isEmpty() || !valueSliders.isEmpty() || !enumDropdowns.isEmpty();
 
         if (anyAbove && hasInputs) {
-            currentY += 4;
+            if (hasBooleans && !hasSliders && !hasEnums) {
+                currentY += 12;
+            } else {
+                currentY += 4;
+
+            }
         }
 
         List<InputProperty> inputs = module.getProperties().stream().filter(p -> p instanceof InputProperty).map(p -> (InputProperty) p).toList();
@@ -330,7 +335,7 @@ public class ComuModule {
         anyAbove = !booleanButtons.isEmpty() || !valueSliders.isEmpty() || !enumDropdowns.isEmpty() || !stringInputs.isEmpty();
 
         if (anyAbove && hasContainers) {
-            currentY += 4;
+            if (hasInputs) currentY -= 4;
         }
 
         List<ListProperty> listProps = module.getProperties().stream().filter(p -> p instanceof ListProperty).map(p -> (ListProperty) p).toList();
@@ -346,8 +351,7 @@ public class ComuModule {
             }
         }
 
-        currentY += 8;
-
+        if (!listProps.isEmpty()) currentY += 8;
         this.height = Math.max(currentY + bottomPad, 25) - 5;
     }
 
