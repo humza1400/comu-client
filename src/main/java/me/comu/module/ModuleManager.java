@@ -5,10 +5,7 @@ import me.comu.module.impl.active.Overlay;
 import me.comu.module.impl.combat.KillAura;
 import me.comu.module.impl.miscellaneous.ChatSpammer;
 import me.comu.module.impl.movement.*;
-import me.comu.module.impl.render.ClickGui;
-import me.comu.module.impl.render.HUD;
-import me.comu.module.impl.render.Nametags;
-import me.comu.module.impl.render.TabGui;
+import me.comu.module.impl.render.*;
 import me.comu.module.impl.world.Timer;
 
 import java.util.List;
@@ -43,6 +40,7 @@ public class ModuleManager extends Registry<Module> {
         register(new Nametags());
         register(new ClickGui());
         register(new TabGui());
+        register(new Freecam());
 
         // World
         register(new Timer());

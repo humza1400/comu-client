@@ -15,6 +15,7 @@ import java.util.List;
 public abstract class Module {
     private final String name;
     private String displayName;
+    private String suffix;
     private final List<String> aliases;
     private final List<Property<?>> properties = new ArrayList<>();
     private final Category category;
@@ -70,6 +71,14 @@ public abstract class Module {
 
     public void resetDisplayName() {
         setDisplayName(name);
+    }
+
+    public String getSuffix() {
+        return suffix;
+    }
+
+    public void setSuffix(String suffix) {
+        this.suffix = suffix;
     }
 
     public List<String> getAliases() {

@@ -32,10 +32,10 @@ public class Nametags extends ToggleableModule {
     BooleanProperty equipment = new BooleanProperty("Equipment", List.of("armor", "a"), true);
     BooleanProperty self = new BooleanProperty("Self", List.of("s"), false);
     BooleanProperty potions = new BooleanProperty("Potions", List.of("potion", "pot", "p"), false);
-    BooleanProperty distance = new BooleanProperty("Distance", List.of("blocks", "d"), false);
+    BooleanProperty distance = new BooleanProperty("Distance", List.of("blocks", "d", "dist"), false);
     BooleanProperty ping = new BooleanProperty("Ping", List.of("ping", "ms"), true);
     BooleanProperty lores = new BooleanProperty("Lore", List.of("lores", "l"), false);
-    BooleanProperty invisibles = new BooleanProperty("Lore", List.of("lores", "l"), true);
+    BooleanProperty invisibles = new BooleanProperty("Invisibles", List.of("invisible", "i", "visible", "visibles"), true);
     BooleanProperty durability = new BooleanProperty("Durability", List.of("dur", "dura"), true);
 
     EnumProperty<HealthLook> healthLook = new EnumProperty<>("Health-Look", List.of("healthlook", "healthmode", "hlook", "mode", "m"), HealthLook.TEN);

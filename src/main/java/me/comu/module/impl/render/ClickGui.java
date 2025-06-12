@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ClickGui extends ToggleableModule {
 
-    private final BooleanProperty blur = new BooleanProperty("Blur", List.of("b"), false);
+    private final BooleanProperty blur = new BooleanProperty("Blur", List.of("b"), true);
     private final BooleanProperty gengar = new BooleanProperty("Gengar", List.of("g"), true);
     private final EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.COMU);
 

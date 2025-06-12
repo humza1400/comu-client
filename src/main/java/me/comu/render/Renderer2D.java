@@ -4,6 +4,7 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 
+// Should be refactored into RenderUtils
 public final class Renderer2D {
     private static final MinecraftClient mc = MinecraftClient.getInstance();
     private static final TextRenderer textRenderer = mc.textRenderer;

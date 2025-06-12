@@ -118,21 +118,27 @@ public class ComuTabGui implements TabGuiRenderer {
 
                     Property<?> prop = properties.get(i);
                     String propName = prop.getName();
-                    String value = "";
-                    if (!(prop instanceof ListProperty)) {
-                        if (prop instanceof EnumProperty<?> enumProp)
-                            value = ": " + enumProp.getFormattedValue();
-                        else
-                            value = ": " + prop.getValue();
-                    }
 
                     int nameWidth = mc.textRenderer.getWidth(propName);
                     int nameColor = selected && (state.inPropertyFocus || state.insideListProperty) ? propertyFocusColor : 0xFFFFFFFF;
-
                     context.drawText(mc.textRenderer, propName, propX + 2, drawY, nameColor, true);
+
                     if (!(prop instanceof ListProperty)) {
-                        context.drawText(mc.textRenderer, value, propX + 2 + nameWidth, drawY, 0xFFFFFFFF, true);
+                        String rawValue;
+                        if (prop instanceof EnumProperty<?> enumProp) {
+                            rawValue = enumProp.getFormattedValue();
+                        } else {
+                            rawValue = String.valueOf(prop.getValue());
+                        }
+
+                        context.drawText(mc.textRenderer, ": ", propX + 2 + nameWidth, drawY, 0xFFFFFFFF, true);
+                        int colonWidth = mc.textRenderer.getWidth(": ");
+                        int valueX = propX + 2 + nameWidth + colonWidth;
+
+                        int valueColor = (prop.getValue() instanceof Boolean b && !b) ? 0xFFAAAAAA : 0xFFFFFFFF;
+                        context.drawText(mc.textRenderer, rawValue, valueX, drawY, valueColor, true);
                     }
+
                 }
 
                 if (state.insideListProperty && state.currentList != null) {
@@ -161,21 +167,25 @@ public class ComuTabGui implements TabGuiRenderer {
 
                         Property<?> prop = listProps.get(i);
                         String propName = prop.getName();
-                        String value = "";
-                        if (!(prop instanceof ListProperty)) {
-                            if (prop instanceof EnumProperty<?> enumProp)
-                                value = ": " + enumProp.getFormattedValue();
-                            else
-                                value = ": " + prop.getValue();
-                        }
-
-
                         int nameWidth = mc.textRenderer.getWidth(propName);
                         int nameColor = selected && state.inPropertyFocus ? propertyFocusColor : 0xFFFFFFFF;
 
                         context.drawText(mc.textRenderer, propName, listPropX + 2, drawY, nameColor, true);
+
                         if (!(prop instanceof ListProperty)) {
-                            context.drawText(mc.textRenderer, value, listPropX + 2 + nameWidth, drawY, 0xFFFFFFFF, true);
+                            String rawValue;
+                            if (prop instanceof EnumProperty<?> enumProp) {
+                                rawValue = enumProp.getFormattedValue();
+                            } else {
+                                rawValue = String.valueOf(prop.getValue());
+                            }
+
+                            context.drawText(mc.textRenderer, ": ", listPropX + 2 + nameWidth, drawY, 0xFFFFFFFF, true);
+                            int colonWidth = mc.textRenderer.getWidth(": ");
+                            int valueX = listPropX + 2 + nameWidth + colonWidth;
+
+                            int valueColor = (prop.getValue() instanceof Boolean b && !b) ? 0xFFAAAAAA : 0xFFFFFFFF;
+                            context.drawText(mc.textRenderer, rawValue, valueX, drawY, valueColor, true);
                         }
                     }
                 }

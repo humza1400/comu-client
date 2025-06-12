@@ -33,6 +33,7 @@ public class Speed extends ToggleableModule {
     public Speed() {
         super("Speed", List.of(), Category.MOVEMENT, "You Go Zoooom");
         offerProperties(speed, mode);
+        setSuffix(mode.getFormattedValue());
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {

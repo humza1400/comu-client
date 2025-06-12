@@ -22,7 +22,7 @@ import java.io.File;
 public class Comu implements ClientModInitializer {
 
     private static final String CLIENT_NAME = "comu";
-    private static final int CLIENT_VERSION = 4;
+    private static final int CLIENT_VERSION = 5;
     public static final Logger LOGGER = LoggerFactory.getLogger(CLIENT_NAME);
 
     private static Comu instance;
@@ -47,8 +47,8 @@ public class Comu implements ClientModInitializer {
         this.commandManager = new CommandManager();
         this.configManager.loadAll();
 
-        // This will be deprecated because we don't use skid code, just here temporarily
-//        MicrosoftLogin.setUserMicrosoft("", "");
+        // This will be removed soon for our own login api since it's a shitty library.
+        MicrosoftLogin.setUserMicrosoft("", "");
         Hook.init();
         HUDRenderer.init();
         LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);

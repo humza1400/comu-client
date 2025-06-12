@@ -43,6 +43,7 @@ public class KillAura extends ToggleableModule {
     public KillAura() {
         super("Kill Aura", List.of("killaura","aura", "ka"), Category.COMBAT, "Attacks any valid targets within reach");
         offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack);
+        setSuffix(mode.getFormattedValue());
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
@@ -98,7 +99,8 @@ public class KillAura extends ToggleableModule {
                             mc.interactionManager.attackEntity(mc.player, target);
                         }
                     } else {
-                        if (stopwatch.hasCompleted(1000 / aps.getValue(), true)) {
+                        int rand = (int) getRandomInRange(-3, 3);
+                        if (stopwatch.hasCompleted((long) (1000 / clamp((float) (aps.getValue() + rand), 1, 20)), true)) {
                             mc.player.swingHand(mc.player.getActiveHand());
                             mc.player.attack(target);
                             mc.interactionManager.attackEntity(mc.player, target);

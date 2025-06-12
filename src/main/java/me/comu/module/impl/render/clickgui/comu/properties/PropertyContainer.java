@@ -37,6 +37,7 @@ public class PropertyContainer {
         inputs.clear();
         nestedContainers.clear();
 
+        int offsetPadding = !listProperty.getBooleanProperties().isEmpty() ? 12 : 18;
         int offsetY = y + 18;
         int gapBetween = 6;
 
@@ -48,7 +49,7 @@ public class PropertyContainer {
 
             if (prop instanceof BooleanProperty boolProp) {
                 booleanButtons.add(new BooleanButton(null, boolProp, x + padding, offsetY, 80, 8));
-                offsetY += 14;
+                offsetY += 6;
             } else if (prop instanceof NumberProperty<?> numProp) {
                 sliders.add(new ValueSlider((NumberProperty) numProp, padding, offsetY - y, width - padding * 2, 8));
                 offsetY += 12;

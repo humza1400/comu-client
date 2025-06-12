@@ -2,6 +2,7 @@ package me.comu.render;
 
 import me.comu.Comu;
 import me.comu.logging.Logger;
+import me.comu.module.ToggleableModule;
 import me.comu.module.impl.render.HUD;
 import me.comu.module.impl.render.TabGui;
 import me.comu.module.impl.render.tabgui.comu.ComuTabGui;
@@ -15,11 +16,13 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Formatting;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Stream;
 
 
 public final class HUDRenderer {
+
+    private static final Map<ToggleableModule, Float> moduleAnimationProgress = new HashMap<>();
 
     public static void init() {
         Logger.getLogger().print("Initializing HUD Renderer");
@@ -48,17 +51,147 @@ public final class HUDRenderer {
         }
 
         if (hud.getArrayList().getValue()) {
-            int y = 4;
-            for (var module : Comu.getInstance().getModuleManager().getToggleableModules()) {
-                if (module.isEnabled() && module.isDrawn()) {
-                    String name = Formatting.GRAY + module.getDisplayName();
-                    int textWidth = Renderer2D.getStringWidth(name);
-                    Renderer2D.drawTextWithBackground(context, name, screenWidth - textWidth - 4, y, 0xFFFFFFFF, 0x90000000, true);
+            List<ToggleableModule> modules = new ArrayList<>(Comu.getInstance().getModuleManager().getToggleableModules());
 
-                    y += Renderer2D.getFontHeight() + 2;
+            HUD.ArrayListSort sortValue = hud.getArrayListSort().getValue();
+            HUD.ArrayListCase caseValue = hud.getArrayListCase().getValue();
+            HUD.ArrayListPosition positionValue = hud.getArrayListPosition().getValue();
+            HUD.ArrayListAnimation animationValue = hud.getArrayListAnimation().getValue();
+            HUD.ArrayListTheme theme = hud.getArrayListTheme().getValue();
+            boolean shouldRenderSuffix = hud.shouldRenderSuffix().getValue();
+
+            int baseX;
+            int y = 4;
+            switch (positionValue) {
+                case TOPLEFT -> {
+                    int padding = 4;
+                    int topOffset = padding;
+                    if (hud.getWatermark().getValue()) topOffset += 11;
+                    if (tabGui != null && tabGui.isEnabled()) topOffset += 76;
+                    y = topOffset;
+                    baseX = padding;
                 }
+                case CROSSHAIR -> {
+                    baseX = screenWidth / 2 + 30;
+                    y = screenHeight / 2 - (modules.size() * (Renderer2D.getFontHeight() + 2)) / 2;
+                }
+                default -> baseX = screenWidth - 4;
+            }
+
+            if (animationValue != HUD.ArrayListAnimation.DEFAULT) {
+                float fadeInSpeed = 0.05f;
+                float fadeOutSpeed = 0.15f;
+
+                for (ToggleableModule module : new ArrayList<>(moduleAnimationProgress.keySet())) {
+                    updateModuleAnimation(module, fadeOutSpeed);
+                }
+
+                for (ToggleableModule module : Comu.getInstance().getModuleManager().getToggleableModules()) {
+                    if (module.isEnabled()) {
+                        moduleAnimationProgress.putIfAbsent(module, 0f);
+                        updateModuleAnimation(module, fadeInSpeed);
+                    }
+                }
+            } else {
+                moduleAnimationProgress.clear();
+            }
+
+            Stream<ToggleableModule> stream = (animationValue == HUD.ArrayListAnimation.DEFAULT ? modules.stream().filter(ToggleableModule::isEnabled) : Comu.getInstance().getModuleManager().getToggleableModules().stream().filter(module -> {
+                Float p = moduleAnimationProgress.get(module);
+                return p != null && p > 0.01f;
+            }));
+
+            List<ToggleableModule> renderList = stream.sorted((a, b) -> switch (sortValue) {
+                case LONGEST ->
+                        Integer.compare(getEffectiveWidth(b, shouldRenderSuffix, caseValue, theme), getEffectiveWidth(a, shouldRenderSuffix, caseValue, theme));
+                case SHORTEST ->
+                        Integer.compare(getEffectiveWidth(a, shouldRenderSuffix, caseValue, theme), getEffectiveWidth(b, shouldRenderSuffix, caseValue, theme));
+                case ABC -> {
+                    String nameA = getStyledName(a, shouldRenderSuffix, caseValue, theme);
+                    String nameB = getStyledName(b, shouldRenderSuffix, caseValue, theme);
+                    yield nameA.compareToIgnoreCase(nameB);
+                }
+                case REVERSE_ABC -> {
+                    String nameA = getStyledName(a, shouldRenderSuffix, caseValue, theme);
+                    String nameB = getStyledName(b, shouldRenderSuffix, caseValue, theme);
+                    yield nameB.compareToIgnoreCase(nameA);
+                }
+                case CATEGORY -> a.getCategory().getName().compareToIgnoreCase(b.getCategory().getName());
+            }).toList();
+
+
+            for (var module : renderList) {
+                if (!module.isDrawn()) continue;
+                float rawProgress = animationValue == HUD.ArrayListAnimation.DEFAULT ? 1f : moduleAnimationProgress.get(module);
+                if (rawProgress <= 0.05f && !module.isEnabled()) continue;
+
+                float progress = switch (animationValue) {
+                    case SLIDE, FADE -> rawProgress;
+                    case BOUNCE -> (float) Math.sin(rawProgress * Math.PI);
+                    default -> 1f;
+                };
+
+                if (progress <= 0f) continue;
+
+                String name = getStyledName(module, shouldRenderSuffix, caseValue, theme);
+
+                int textWidth = Renderer2D.getStringWidth(name);
+                int drawX = switch (positionValue) {
+                    case TOPLEFT, CROSSHAIR -> baseX;
+                    case TOPRIGHT -> baseX - textWidth;
+                };
+
+                int animatedX = drawX;
+                int alpha = 0xFFFFFFFF;
+                int drawY = y;
+                switch (animationValue) {
+                    case SLIDE -> {
+                        int offscreenX = (positionValue == HUD.ArrayListPosition.TOPLEFT || positionValue == HUD.ArrayListPosition.CROSSHAIR) ? baseX - textWidth - 40 : screenWidth + 40;
+                        animatedX = (int) (offscreenX + (drawX - offscreenX) * progress);
+                    }
+                    case FADE -> {
+                        int alphaValue = (int) (255 * progress);
+                        alpha = (alphaValue << 24) | 0xFFFFFF;
+                    }
+                    case BOUNCE -> {
+                        drawY -= 20;
+                        float bounceProgress = moduleAnimationProgress.get(module);
+                        boolean isDisabling = rawProgress < 1f && !module.isEnabled();
+
+                        float bounce = (float) Math.sin(bounceProgress * Math.PI);
+                        if (isDisabling) bounce = 1f - bounce;
+
+                        int fadeAlpha = getFadeAlpha(isDisabling, rawProgress);
+
+                        alpha = (fadeAlpha << 24) | 0xFFFFFF;
+
+                        float bounceHeight = 20;
+                        drawY += Math.round((1f - bounce) * bounceHeight);
+                    }
+                }
+
+                int baseRGB = switch (theme) {
+                    case GRAYSCALE -> 0x666666;
+                    case WHITE -> 0xFFFFFF;
+                    default -> 0xFFFFFF;
+                };
+                int color = (alpha & 0xFF000000) | baseRGB;
+
+                boolean withBackground = switch (theme) {
+                    case MINECRAFT, COMU -> true;
+                    default -> false;
+                };
+
+                if (withBackground) {
+                    Renderer2D.drawTextWithBackground(context, name, animatedX, drawY, alpha, 0x90000000, true);
+                } else {
+                    Renderer2D.drawText(context, name, animatedX, drawY, color, true);
+                }
+
+                y += Renderer2D.getFontHeight() + 2;
             }
         }
+
 
         int yOffset = screenHeight - 2;
         if (hud.getPotions().getValue()) yOffset = drawPotions(context, screenWidth, yOffset);
@@ -153,9 +286,7 @@ public final class HUDRenderer {
             }
         }
 
-        String text = isGappled
-                ? Formatting.GREEN + "Gappled " + Formatting.GRAY + "(" + durationSeconds + ")"
-                : Formatting.RED.toString() + Formatting.UNDERLINE + "NOT Gappled";
+        String text = isGappled ? Formatting.GREEN + "Gappled " + Formatting.GRAY + "(" + durationSeconds + ")" : Formatting.RED.toString() + Formatting.UNDERLINE + "NOT Gappled";
 
         int textWidth = Renderer2D.getStringWidth(text);
 
@@ -208,4 +339,68 @@ public final class HUDRenderer {
             }
         }
     }
+
+    private static void updateModuleAnimation(ToggleableModule module, float speed) {
+        float current = moduleAnimationProgress.getOrDefault(module, module.isEnabled() ? 0f : 1f);
+        float target = module.isEnabled() ? 1f : 0f;
+        float updated = current + (target - current) * speed;
+
+        if (!module.isEnabled() && updated < 0.01f) {
+            moduleAnimationProgress.remove(module);
+            return;
+        }
+
+        moduleAnimationProgress.put(module, updated);
+    }
+
+    private static int getFadeAlpha(boolean isDisabling, Float rawProgress) {
+        int fadeAlpha;
+        if (isDisabling) {
+            float smoothFade = (float) Math.pow(rawProgress, 0.5);
+            fadeAlpha = Math.max(0, Math.min(255, (int) (255 * smoothFade)));
+        } else {
+            fadeAlpha = Math.max(0, Math.min(255, (int) (255 * rawProgress)));
+        }
+
+        if (fadeAlpha < 10 && rawProgress > 0.01f) {
+            fadeAlpha = 10;
+        }
+        return fadeAlpha;
+    }
+
+    private static int getEffectiveWidth(ToggleableModule module, boolean shouldRenderSuffix, HUD.ArrayListCase caseValue, HUD.ArrayListTheme theme) {
+        String styledName = getStyledName(module, shouldRenderSuffix, caseValue, theme);
+        return Renderer2D.getStringWidth(styledName);
+    }
+
+
+    private static String getStyledName(ToggleableModule module, boolean shouldRenderSuffix, HUD.ArrayListCase caseValue, HUD.ArrayListTheme theme) {
+        String displayName = module.getDisplayName();
+        String suffix = shouldRenderSuffix && module.getSuffix() != null ? module.getSuffix() : null;
+
+        String name;
+        switch (caseValue) {
+            case CUB -> name = "[" + displayName + "]";
+            case PAREN -> name = "(" + displayName + ")";
+            case DASH -> name = "- " + displayName + " -";
+            case STAR -> name = "*" + displayName + "*";
+            default -> name = displayName;
+        }
+
+        if (suffix != null) {
+            if (theme == HUD.ArrayListTheme.MINECRAFT && caseValue != HUD.ArrayListCase.DASH) {
+                name += "&7 - " + suffix;
+            } else {
+                name += "&7 " + suffix;
+            }
+        }
+
+        return switch (caseValue) {
+            case LOWER -> name.toLowerCase();
+            case UPPER -> name.toUpperCase();
+            default -> name;
+        };
+    }
+
+
 }
