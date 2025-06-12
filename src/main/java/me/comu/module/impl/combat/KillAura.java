@@ -32,18 +32,21 @@ public class KillAura extends ToggleableModule {
     NumberProperty<Integer> fov = new NumberProperty<>("FOV", List.of(), 180, 1, 180, 30);
 
     EnumProperty<Mode> mode = new EnumProperty<>("Targeting", List.of("m", "t", "mode"), Mode.SINGLE);
+    NumberProperty<Float> delta = new NumberProperty<>("Delta", List.of(), 1.2F, 0F, 2F, 0.1F);
+    NumberProperty<Integer> smooth = new NumberProperty<>("Smooth", List.of(), 70, 0, 100, 1);
 
     public enum Mode {SINGLE, SWITCH}
 
     private final Stopwatch stopwatch = new Stopwatch();
     private Entity target = null;
     private Entity lastTarget = null;
+    public static float clientRotationYaw, clientRotationPitch;
+    private boolean shouldReturnToClientRotation = false;
     private float currentYaw, currentPitch;
 
     public KillAura() {
         super("Kill Aura", List.of("killaura","aura", "ka"), Category.COMBAT, "Attacks any valid targets within reach");
-        offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack);
-        setSuffix(mode.getFormattedValue());
+        offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack, delta, smooth);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
@@ -53,7 +56,7 @@ public class KillAura extends ToggleableModule {
                         float baseYaw = mc.player.getYaw();
                         float basePitch = mc.player.getPitch();
 
-                        float[] normalized = normalizeRotation(baseYaw, basePitch, currentYaw, currentPitch, 1.5F);
+                        float[] normalized = normalizeRotation(baseYaw, basePitch, currentYaw, currentPitch, delta.getValue());
 
                         currentYaw = normalized[0];
                         currentPitch = normalized[1];
@@ -72,9 +75,9 @@ public class KillAura extends ToggleableModule {
                     float targetYaw = wrapYawToBase(rawTargetYaw, baseYaw);
                     float targetPitch = clamp(rotations[1], -87f, 87f);
 
-                    float[] normalized = normalizeRotation(targetYaw, (float) (targetPitch + getRandomInRange(-5, 5)), baseYaw, basePitch, 1.5F);
+                    float[] normalized = normalizeRotation(targetYaw, (float) (targetPitch + getRandomInRange(-5, 5)), baseYaw, basePitch, delta.getValue());
 
-                    currentYaw = normalized [0];
+                    currentYaw = normalized[0];
                     currentPitch = normalized[1];
 
                     event.setYaw(currentYaw);
@@ -109,6 +112,35 @@ public class KillAura extends ToggleableModule {
                 }
             }
         });
+
+        listeners.add(new Listener<>(MotionEvent.class, true) {
+            @Override
+            public void call(MotionEvent event) {
+                clientRotationYaw = mc.player.getYaw();
+                clientRotationPitch = mc.player.getPitch();
+
+                if (shouldReturnToClientRotation) {
+                    float wrappedYaw = wrapYawToBase(mc.player.getYaw(), currentYaw);
+                    float wrappedPitch = clamp(mc.player.getPitch(), -90f, 90f);
+                    float[] normalized = normalizeRotation(wrappedYaw, wrappedPitch, currentYaw, currentPitch, delta.getValue());
+
+
+                    currentYaw = normalized[0];
+                    currentPitch = normalized[1];
+
+                    event.setYaw(currentYaw);
+                    event.setPitch(currentPitch);
+
+                    float yawDiff = Math.abs(currentYaw - mc.player.getYaw());
+                    float pitchDiff = Math.abs(currentPitch - mc.player.getPitch());
+
+                    if (yawDiff < 0.1f && pitchDiff < 0.1f) {
+                        shouldReturnToClientRotation = false;
+                    }
+
+                }
+            }
+        });
     }
 
     @Override
@@ -116,6 +148,7 @@ public class KillAura extends ToggleableModule {
         super.onDisable();
         if(isPlayerOrWorldNull(mc)) return;
         target = null;
+        shouldReturnToClientRotation = true;
     }
 
     public void onEnable() {
@@ -206,7 +239,7 @@ public class KillAura extends ToggleableModule {
         float yawDelta = RotationUtils.getAngleDelta(baseYaw, targetYaw);
         float pitchDelta = targetPitch - basePitch;
 
-        float baseYawChange = 80f;
+        float baseYawChange = smooth.getValue();
         float basePitchChange = 22.0f;
 
         float maxYawChange = addRandomization(baseYawChange, 2.0f);
