@@ -1,11 +1,8 @@
 package me.comu.module;
 
-import me.comu.Comu;
 import me.comu.api.registry.event.listener.Listener;
-import me.comu.logging.Logger;
-import me.comu.mixin.minecraft.MinecraftClientAccessor;
+import me.comu.mixin.minecraft.accessor.MinecraftClientAccessor;
 import me.comu.property.Property;
-import me.comu.property.properties.ListProperty;
 import net.minecraft.client.MinecraftClient;
 
 import java.util.ArrayList;
@@ -20,6 +17,7 @@ public abstract class Module {
     private final List<Property<?>> properties = new ArrayList<>();
     private final Category category;
     private final String description;
+    private boolean drawn = true;
 
     @SuppressWarnings("rawtypes")
     protected final List<Listener> listeners = new ArrayList<>();
@@ -104,5 +102,13 @@ public abstract class Module {
     @Override
     public String toString() {
         return displayName;
+    }
+
+    public void setDrawn(boolean drawn) {
+        this.drawn = drawn;
+    }
+
+    public boolean isDrawn() {
+        return drawn;
     }
 }

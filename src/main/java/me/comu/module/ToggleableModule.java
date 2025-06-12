@@ -8,7 +8,6 @@ import java.util.List;
 
 public class ToggleableModule extends Module {
     private boolean enabled;
-    private boolean drawn = true;
     private final Keybind keybind;
 
     public ToggleableModule(String name, List<String> aliases, Category category, String description) {
@@ -50,14 +49,6 @@ public class ToggleableModule extends Module {
         this.enabled = enabled;
         if (enabled) onEnable();
         else onDisable();
-    }
-
-    public void setDrawn(boolean drawn) {
-        this.drawn = drawn;
-    }
-
-    public boolean isDrawn() {
-        return drawn;
     }
 
     public Keybind getKeybind() {

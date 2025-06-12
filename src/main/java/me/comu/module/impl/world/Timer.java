@@ -12,6 +12,7 @@ public class Timer extends ToggleableModule {
 
     public Timer() {
         super("Timer", List.of("timerspeed"), Category.WORLD, "Speeds up everything in the game");
+        setSuffix(timer.getValue().toString());
         offerProperties(timer);
     }
 }

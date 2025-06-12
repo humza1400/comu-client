@@ -26,7 +26,7 @@ public class NoSlowdown extends ToggleableModule {
     }
 
     public NoSlowdown() {
-        super("NoSlowdown", List.of("noslow"), Category.MOVEMENT, "Consume items without slowing down");
+        super("No Slowdown", List.of("noslow", "noslow"), Category.MOVEMENT, "Consume items without slowing down");
         offerProperties(mode);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override

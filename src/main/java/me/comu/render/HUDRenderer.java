@@ -2,12 +2,15 @@ package me.comu.render;
 
 import me.comu.Comu;
 import me.comu.logging.Logger;
+import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.module.impl.render.HUD;
 import me.comu.module.impl.render.TabGui;
 import me.comu.module.impl.render.tabgui.comu.ComuTabGui;
 import me.comu.utils.ClientUtils;
+import me.comu.utils.ItemUtils;
 import me.comu.utils.RenderUtils;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.gui.DrawContext;
@@ -16,7 +19,9 @@ import net.minecraft.entity.effect.StatusEffects;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.Formatting;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Stream;
 
 
@@ -24,9 +29,20 @@ public final class HUDRenderer {
 
     private static final Map<ToggleableModule, Float> moduleAnimationProgress = new HashMap<>();
 
+    private static int indigoFadeState = 0;
+    private static boolean indigoGoingUp = false;
+
     public static void init() {
         Logger.getLogger().print("Initializing HUD Renderer");
         HudRenderCallback.EVENT.register(HUDRenderer::onRender);
+
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            HUD hud = (HUD) Comu.getInstance().getModuleManager().getModuleByName("HUD");
+            if (hud != null && hud.isEnabled() && hud.getArrayListTheme().getValue() == HUD.ArrayListTheme.INDIGO) {
+                updateIndigoFadeState();
+            }
+        });
+
     }
 
     private static final ComuTabGui renderer = new ComuTabGui();
@@ -170,12 +186,15 @@ public final class HUDRenderer {
                     }
                 }
 
-                int baseRGB = switch (theme) {
-                    case GRAYSCALE -> 0x666666;
-                    case WHITE -> 0xFFFFFF;
-                    default -> 0xFFFFFF;
+                int color = switch (theme) {
+                    case RAINBOW -> getRainbowColor(y, 0.002f, 0.8f, 1.0f, (alpha >> 24));
+                    case COMU -> getComuColor(drawY, rawProgress);
+                    case INDIGO -> getIndigoColor(progress);
+                    case VIRTUE -> getVirtueColor(module.getCategory(), progress);
+                    case GRAYSCALE -> (alpha & 0xFF000000) | 0x666666;
+                    case WHITE -> (alpha & 0xFF000000) | 0xFFFFFF;
+                    default -> (alpha & 0xFF000000) | 0xFFFFFF;
                 };
-                int color = (alpha & 0xFF000000) | baseRGB;
 
                 boolean withBackground = switch (theme) {
                     case MINECRAFT, COMU -> true;
@@ -183,15 +202,16 @@ public final class HUDRenderer {
                 };
 
                 if (withBackground) {
-                    Renderer2D.drawTextWithBackground(context, name, animatedX, drawY, alpha, 0x90000000, true);
+                    Renderer2D.drawTextWithBackground(context, name, animatedX, drawY, color, 0x66000000, true);
                 } else {
                     Renderer2D.drawText(context, name, animatedX, drawY, color, true);
                 }
 
                 y += Renderer2D.getFontHeight() + 2;
             }
-        }
 
+
+        }
 
         int yOffset = screenHeight - 2;
         if (hud.getPotions().getValue()) yOffset = drawPotions(context, screenWidth, yOffset);
@@ -301,7 +321,7 @@ public final class HUDRenderer {
         List<ItemStack> items = new ArrayList<>();
 
         for (int i = 1; i <= 4; i++) {
-            ItemStack stack = ClientUtils.getEquipmentItem(mc.player, i);
+            ItemStack stack = ItemUtils.getEquipmentItem(mc.player, i);
             if (!stack.isEmpty()) items.add(stack);
         }
 
@@ -388,11 +408,9 @@ public final class HUDRenderer {
         }
 
         if (suffix != null) {
-            if (theme == HUD.ArrayListTheme.MINECRAFT && caseValue != HUD.ArrayListCase.DASH) {
-                name += "&7 - " + suffix;
-            } else {
-                name += "&7 " + suffix;
-            }
+            if (theme == HUD.ArrayListTheme.VIRTUE) {
+                name += Formatting.GRAY + " [" + suffix + "]";
+            } else name += Formatting.GRAY + " " + suffix;
         }
 
         return switch (caseValue) {
@@ -402,5 +420,68 @@ public final class HUDRenderer {
         };
     }
 
+    private static int getRainbowColor(int yOffset, float speed, float saturation, float brightness, int alpha) {
+        float hue = (System.currentTimeMillis() % 6000L) / 6000f + yOffset * speed;
+        hue %= 1.0f;
+        int rgb = Color.HSBtoRGB(hue, saturation, brightness);
+        return (alpha << 24) | (rgb & 0x00FFFFFF);
+    }
+
+    private static int getComuColor(int drawY, float progress) {
+        int alpha = Math.max(10, Math.min(255, (int) (255 * progress)));
+
+        float time = (System.currentTimeMillis() % 3000L) / 3000f;
+        float waveOffset = (float) Math.sin(drawY * 0.04 + time * Math.PI * 2);
+        float pulseOffset = (float) Math.sin(time * Math.PI * 2 * 2);
+
+        float hue = ((drawY * 0.002f + time + waveOffset * 0.1f) % 1.0f);
+        float saturation = 0.85f + 0.15f * pulseOffset;
+        float brightness = 0.85f + 0.15f * pulseOffset;
+
+        int rgb = Color.HSBtoRGB(hue, saturation, brightness) & 0x00FFFFFF;
+        return (alpha << 24) | rgb;
+    }
+
+    public static int getIndigoColor(float progress) {
+        double ratio = indigoFadeState / 25.0;
+        int fadeHex = getFadeHex(-23614, -3394561, ratio);
+        int alpha = Math.max(10, Math.min(255, (int) (255 * progress)));
+
+        return (alpha << 24) | (fadeHex & 0x00FFFFFF);
+    }
+
+    public static void updateIndigoFadeState() {
+        if (indigoFadeState >= 25 || indigoFadeState <= 0) indigoGoingUp = !indigoGoingUp;
+
+        indigoFadeState += indigoGoingUp ? 1 : -1;
+    }
+
+    private static int getFadeHex(int hex1, int hex2, double ratio) {
+        int r1 = (hex1 >> 16) & 0xFF, g1 = (hex1 >> 8) & 0xFF, b1 = hex1 & 0xFF;
+        int r2 = (hex2 >> 16) & 0xFF, g2 = (hex2 >> 8) & 0xFF, b2 = hex2 & 0xFF;
+
+        int r = (int) (r1 + (r2 - r1) * ratio);
+        int g = (int) (g1 + (g2 - g1) * ratio);
+        int b = (int) (b1 + (b2 - b1) * ratio);
+
+        return (r << 16) | (g << 8) | b;
+    }
+
+    public static int getVirtueColor(Category category, float progress) {
+        int alpha = Math.max(10, Math.min(255, (int)(255 * progress)));
+        int baseColor;
+
+        switch (category) {
+            case COMBAT -> baseColor = 0xFFFA5551;
+            case EXPLOITS -> baseColor = 0x5CCEFF;
+            case MOVEMENT -> baseColor = 0x77A7F7;
+            case MISCELLANEOUS -> baseColor = 0xB4FFAC;
+            case RENDER -> baseColor = 0xFFFFFFFF;
+            case WORLD -> baseColor = 0xF7A72E;
+            default -> baseColor = 0xCCCCCC;
+        }
+
+        return (alpha << 24) | (baseColor & 0x00FFFFFF);
+    }
 
 }

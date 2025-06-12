@@ -40,6 +40,8 @@ public class ModulesConfig extends Config {
                 object.addProperty("displayName", module.getDisplayName());
             }
 
+            object.addProperty("drawn", module.isDrawn());
+
             if (module instanceof ToggleableModule toggleable) {
                 object.addProperty("enabled", toggleable.isEnabled());
 
@@ -91,6 +93,10 @@ public class ModulesConfig extends Config {
                 if (obj.has("displayName")) {
                     String displayName = obj.get("displayName").getAsString();
                     module.setDisplayName(displayName);
+                }
+
+                if (obj.has("drawn")) {
+                    module.setDrawn(obj.get("drawn").getAsBoolean());
                 }
 
                 if (module instanceof ToggleableModule toggleable) {

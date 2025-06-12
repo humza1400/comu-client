@@ -21,8 +21,8 @@ import java.util.stream.StreamSupport;
 
 public class KillAura extends ToggleableModule {
 
-    BooleanProperty mobs = new BooleanProperty("Monsters", List.of("mobs", "mob", "zombie", "zombies", "skeleton", "skeletons"), true);
-    BooleanProperty passives = new BooleanProperty("Passives", List.of("passive", "villager", "villagers", "neutral", "neutrals", "animal", "cow", "cows", "sheep"), true);
+    BooleanProperty mobs = new BooleanProperty("Monsters", List.of("mobs", "mob", "zombie", "zombies", "skeleton", "skeletons", "monster", "mon", "p"), true);
+    BooleanProperty passives = new BooleanProperty("Passives", List.of("passive", "villager", "villagers", "neutral", "neutrals", "animal", "cow", "cows", "sheep", "anim", "a"), true);
     BooleanProperty players = new BooleanProperty("Players", List.of("player", "people"), true);
     BooleanProperty rayTrace = new BooleanProperty("Ray-Trace", List.of("raytrace", "rayt", "ray", "rt"), true);
     BooleanProperty cooldownAttack = new BooleanProperty("Cooldown", List.of("1.9pvp", "19pvp", "1.9", "19", "cd"), false);
@@ -33,7 +33,7 @@ public class KillAura extends ToggleableModule {
 
     EnumProperty<Mode> mode = new EnumProperty<>("Targeting", List.of("m", "t", "mode"), Mode.SINGLE);
     NumberProperty<Float> delta = new NumberProperty<>("Delta", List.of(), 1.2F, 0F, 2F, 0.1F);
-    NumberProperty<Integer> smooth = new NumberProperty<>("Smooth", List.of(), 70, 0, 100, 1);
+    NumberProperty<Integer> smooth = new NumberProperty<>("Yaw-Delta", List.of(), 70, 0, 100, 10);
 
     public enum Mode {SINGLE, SWITCH}
 
@@ -47,6 +47,7 @@ public class KillAura extends ToggleableModule {
     public KillAura() {
         super("Kill Aura", List.of("killaura","aura", "ka"), Category.COMBAT, "Attacks any valid targets within reach");
         offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack, delta, smooth);
+        setSuffix(mode.getFormattedValue());
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {

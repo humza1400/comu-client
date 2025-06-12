@@ -49,7 +49,7 @@ public class PropertyContainer {
 
             if (prop instanceof BooleanProperty boolProp) {
                 booleanButtons.add(new BooleanButton(null, boolProp, x + padding, offsetY, 80, 8));
-                offsetY += 6;
+                offsetY += 14;
             } else if (prop instanceof NumberProperty<?> numProp) {
                 sliders.add(new ValueSlider((NumberProperty) numProp, padding, offsetY - y, width - padding * 2, 8));
                 offsetY += 12;

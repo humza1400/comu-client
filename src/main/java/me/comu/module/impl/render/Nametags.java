@@ -8,6 +8,7 @@ import me.comu.module.ToggleableModule;
 import me.comu.property.properties.BooleanProperty;
 import me.comu.property.properties.EnumProperty;
 import me.comu.utils.ClientUtils;
+import me.comu.utils.ItemUtils;
 import me.comu.utils.RenderUtils;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.entity.EquipmentSlot;
@@ -41,7 +42,7 @@ public class Nametags extends ToggleableModule {
     EnumProperty<HealthLook> healthLook = new EnumProperty<>("Health-Look", List.of("healthlook", "healthmode", "hlook", "mode", "m"), HealthLook.TEN);
 
     public enum HealthLook {
-         TEN, TWENTY, PERCENT
+        TEN, TWENTY, PERCENT
     }
 
     public Nametags() {
@@ -53,13 +54,10 @@ public class Nametags extends ToggleableModule {
                 if (mc.player == null || mc.world == null || mc.cameraEntity == null) return;
 
                 for (PlayerEntity player : mc.world.getPlayers()) {
-                    if ((!self.getValue() && player == mc.player) || (!invisibles.getValue() && player.isInvisible())) continue;
+                    if ((!self.getValue() && player == mc.player) || (!invisibles.getValue() && player.isInvisible()))
+                        continue;
 
-                    Vec3d interpolatedPos = new Vec3d(
-                            player.lastRenderX + (player.getX() - player.lastRenderX) * event.getTickDelta(),
-                            player.lastRenderY + (player.getY() - player.lastRenderY) * event.getTickDelta(),
-                            player.lastRenderZ + (player.getZ() - player.lastRenderZ) * event.getTickDelta()
-                    );
+                    Vec3d interpolatedPos = new Vec3d(player.lastRenderX + (player.getX() - player.lastRenderX) * event.getTickDelta(), player.lastRenderY + (player.getY() - player.lastRenderY) * event.getTickDelta(), player.lastRenderZ + (player.getZ() - player.lastRenderZ) * event.getTickDelta());
 
                     Vec3d playerPos = interpolatedPos.add(0, player.getHeight() + 0.1, 0);
 
@@ -81,11 +79,7 @@ public class Nametags extends ToggleableModule {
                     mats.scale(scale, scale, 1);
                     mats.translate(-textW / 2f, -textH - 2f, 0);
 
-                    event.getContext().fill(
-                            -2, -2,
-                            textW + 2, textH + 2,
-                            0x77000000
-                    );
+                    event.getContext().fill(-2, -2, textW + 2, textH + 2, 0x77000000);
 
                     event.getContext().drawText(mc.textRenderer, name, 0, 0, 0xFFAAAAAA, true);
                     if (equipment.getValue()) {
@@ -104,11 +98,7 @@ public class Nametags extends ToggleableModule {
         Vec3d forward = Vec3d.fromPolar(mc.gameRenderer.getCamera().getPitch(), mc.gameRenderer.getCamera().getYaw());
         Vec3d up = forward.y == 1.0 || forward.y == -1.0 ? new Vec3d(0, 0, 1) : new Vec3d(0, 1, 0);
 
-        Matrix4f viewMatrix = new Matrix4f().lookAt(
-                new org.joml.Vector3f((float) camPos.x, (float) camPos.y, (float) camPos.z),
-                new org.joml.Vector3f((float) (camPos.x + forward.x), (float) (camPos.y + forward.y), (float) (camPos.z + forward.z)),
-                new org.joml.Vector3f((float) up.x, (float) up.y, (float) up.z)
-        );
+        Matrix4f viewMatrix = new Matrix4f().lookAt(new org.joml.Vector3f((float) camPos.x, (float) camPos.y, (float) camPos.z), new org.joml.Vector3f((float) (camPos.x + forward.x), (float) (camPos.y + forward.y), (float) (camPos.z + forward.z)), new org.joml.Vector3f((float) up.x, (float) up.y, (float) up.z));
 
         float fov = (float) Math.toRadians(((GameRendererAccessor) mc.gameRenderer).callGetFov(mc.gameRenderer.getCamera(), tickDelta, true));
         float aspect = (float) mc.getWindow().getFramebufferWidth() / mc.getWindow().getFramebufferHeight();
@@ -136,7 +126,7 @@ public class Nametags extends ToggleableModule {
         List<ItemStack> items = new ArrayList<>();
 
         for (int i = 0; i <= 5; i++) {
-            ItemStack stack = ClientUtils.getEquipmentItem(player, i);
+            ItemStack stack = ItemUtils.getEquipmentItem(player, i);
             if (!stack.isEmpty()) items.add(stack);
         }
 
@@ -152,6 +142,8 @@ public class Nametags extends ToggleableModule {
 
         for (int i = 0; i < items.size(); i++) {
             ItemStack stack = items.get(i);
+            int omegaColor = ItemUtils.hasCurseOfVanishing(stack) ? 0x1d1f1d : 0xFF1706;
+            boolean isOmegaOrSimilar = ItemUtils.isOmega(stack) || ItemUtils.isPurpleGodSword(stack) || ItemUtils.isPunch2OrBetter(stack);
             float x = startX + i * iconSpacing;
 
             RenderUtils.drawItem(context, stack, (int) x, (int) yOffset, 1f, true);
@@ -176,7 +168,7 @@ public class Nametags extends ToggleableModule {
 
                 context.getMatrices().pop();
             }
-            List<String> enchants = ClientUtils.getShortenedEnchantments(stack);
+            List<String> enchants = ItemUtils.getShortenedEnchantments(stack);
             if (!enchants.isEmpty()) {
                 context.getMatrices().push();
 
@@ -186,7 +178,7 @@ public class Nametags extends ToggleableModule {
 
                 for (int j = 0; j < enchants.size(); j++) {
                     String txt = enchants.get(j);
-                    context.drawText(mc.textRenderer, txt, 0, j * 8, 0xFFFFFFFF, true);
+                    context.drawText(mc.textRenderer, txt, 0, j * 8, isOmegaOrSimilar ? omegaColor : 0xFFFFFFFF, true);
                 }
 
                 context.getMatrices().pop();
@@ -214,12 +206,9 @@ public class Nametags extends ToggleableModule {
 //        }
 
         if (ping.getValue()) {
-            int pingInt = mc.getNetworkHandler().getPlayerListEntry(player.getUuid()) != null
-                    ? mc.getNetworkHandler().getPlayerListEntry(player.getUuid()).getLatency()
-                    : -1;
+            int pingInt = mc.getNetworkHandler().getPlayerListEntry(player.getUuid()) != null ? mc.getNetworkHandler().getPlayerListEntry(player.getUuid()).getLatency() : -1;
             name.append(Text.literal(" [" + pingInt + "ms]").formatted(Formatting.GRAY));
         }
-
 
 
         float health = player.getHealth();

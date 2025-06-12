@@ -3,13 +3,18 @@ package me.comu.utils;
 import me.comu.Comu;
 import me.comu.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
+import net.minecraft.registry.Registries;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
@@ -22,31 +27,6 @@ import java.util.List;
 public class ClientUtils {
 
     private static MinecraftClient mc = MinecraftClient.getInstance();
-
-    private static final List<String> ENCHANTMENT_PRIORITY_LIST = List.of(
-            "sharpness",
-            "fire_aspect",
-            "knockback",
-            "looting",
-            "efficiency",
-            "silk_touch",
-            "fortune",
-            "power",
-            "punch",
-            "flame",
-            "infinity",
-            "protection",
-            "projectile_protection",
-            "blast_protection",
-            "fire_protection",
-            "thorns",
-            "feather_falling",
-            "aqua_affinity",
-            "respiration",
-            "unbreaking",
-            "mending",
-            "frost_walker"
-    );
 
     public static int getKeyCodeByName(String name) {
         try {
@@ -62,7 +42,8 @@ public class ClientUtils {
                 if (field.getName().startsWith("GLFW_KEY_") && (int) field.get(null) == keyCode) {
                     return field.getName().replace("GLFW_KEY_", "");
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
         }
         return "UNKNOWN";
     }
@@ -82,7 +63,9 @@ public class ClientUtils {
     }
 
     public static void packet(Packet<?> packet) {
-        if (mc.getNetworkHandler() == null) { return; }
+        if (mc.getNetworkHandler() == null) {
+            return;
+        }
         mc.getNetworkHandler().sendPacket(packet);
     }
 
@@ -102,90 +85,6 @@ public class ClientUtils {
         int i = text.length();
         while (i > 0 && Renderer2D.getStringWidth(text.substring(0, i)) > maxWidth) i--;
         return text.substring(0, i);
-    }
-
-    public static List<String> getShortenedEnchantments(ItemStack stack) {
-        List<String> lines = new ArrayList<>();
-        List<ClientUtils.Triple<String, Integer, Integer>> enchList = new ArrayList<>(); // id, level, priority
-
-        ItemEnchantmentsComponent enchantments = EnchantmentHelper.getEnchantments(stack);
-        for (RegistryEntry<Enchantment> enchantment : enchantments.getEnchantments()) {
-            String id = enchantment.getIdAsString().replace("minecraft:", "").toLowerCase();
-            int lvl = enchantments.getLevel(enchantment);
-            if (lvl <= 0) continue;
-
-            int priority = ENCHANTMENT_PRIORITY_LIST.indexOf(id);
-            if (priority == -1) priority = Integer.MAX_VALUE;
-
-            enchList.add(new ClientUtils.Triple<>(id, lvl, priority));
-        }
-
-        enchList.sort(Comparator.comparingInt(ClientUtils.Triple::third));
-        for (Triple<String, Integer, Integer> stringIntegerIntegerTriple : enchList) {
-            String id = stringIntegerIntegerTriple.first();
-            int lvl = stringIntegerIntegerTriple.second();
-            String shortName = switch (id) {
-                case "sharpness" -> "sh";
-                case "fire_aspect" -> "fa";
-                case "knockback" -> "kb";
-                case "looting" -> "lt";
-                case "sweeping" -> "sw";
-                case "unbreaking" -> "ub";
-                case "efficiency" -> "ef";
-                case "fortune" -> "fo";
-                case "mending" -> "me";
-                case "protection" -> "pr";
-                case "fire_protection" -> "fp";
-                case "blast_protection" -> "bp";
-                case "projectile_protection" -> "pp";
-                case "feather_falling" -> "ff";
-                case "respiration" -> "rs";
-                case "aqua_affinity" -> "aa";
-                case "depth_strider" -> "ds";
-                case "frost_walker" -> "fw";
-                case "thorns" -> "th";
-                case "binding_curse" -> "bc";
-                case "vanishing_curse" -> "vc";
-                case "bane_of_arthropods" -> "ar";
-                case "breach" -> "br";
-                case "channeling" -> "ch";
-                case "density" -> "de";
-                case "flame" -> "fl";
-                case "impaling" -> "im";
-                case "infinity" -> "in";
-                case "loyalty" -> "lo";
-                case "luck_of_the_sea" -> "ls";
-                case "lure" -> "lu";
-                case "multishot" -> "ms";
-                case "piercing" -> "pi";
-                case "power" -> "po";
-                case "punch" -> "pu";
-                case "quick_charge" -> "qc";
-                case "riptide" -> "rt";
-                case "silk_touch" -> "st";
-                case "smite" -> "sm";
-                case "soul_speed" -> "ss";
-                case "sweeping_edge" -> "se";
-                case "swift_sneak" -> "ss";
-                case "wind_burst" -> "wb";
-
-                default -> id.length() > 2 ? id.substring(0, 2) : id;
-            };
-            lines.add(shortName + lvl);
-        }
-        return lines;
-    }
-
-    public static ItemStack getEquipmentItem(PlayerEntity player, int index) {
-        return switch (index) {
-            case 0 -> player.getMainHandStack();
-            case 1 -> player.getEquippedStack(EquipmentSlot.HEAD);
-            case 2 -> player.getEquippedStack(EquipmentSlot.CHEST);
-            case 3 -> player.getEquippedStack(EquipmentSlot.LEGS);
-            case 4 -> player.getEquippedStack(EquipmentSlot.FEET);
-            case 5 -> player.getOffHandStack();
-            default -> ItemStack.EMPTY;
-        };
     }
 
     public static Identifier identifier(String path) {

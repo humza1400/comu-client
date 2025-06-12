@@ -1,10 +1,10 @@
 package me.comu.module.impl.movement;
 
 import me.comu.api.registry.event.listener.Listener;
+import me.comu.events.JumpEvent;
 import me.comu.events.MotionEvent;
 import me.comu.events.PacketEvent;
-import me.comu.events.TickEvent;
-import me.comu.logging.Logger;
+import me.comu.ducks.PlayerMovePacketDuck;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.EnumProperty;
@@ -15,8 +15,7 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.Potions;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
@@ -72,11 +71,34 @@ public class Speed extends ToggleableModule {
                         }
 
                         MovementUtils.setStrafe(speed);
-                        attribute.setBaseValue(0.005);
+
+                        double randomOffset = 0.0045 + Math.random() * 0.001;
+                        mc.player.setVelocity(mc.player.getVelocity().x, randomOffset, mc.player.getVelocity().z);
                         break;
                 }
             }
         });
+
+        listeners.add(new Listener<>(PacketEvent.class) {
+            @Override
+            public void call(PacketEvent event) {
+                if (mode.getValue() == Mode.VULCAN) {
+                    if (event.getPacket() instanceof PlayerMoveC2SPacket.Full packet) {
+                        ((PlayerMovePacketDuck) packet).setY(packet.getY(mc.player.getY()) + 0.005);
+                    }
+                }
+            }
+        });
+
+        listeners.add(new Listener<>(JumpEvent.class) {
+            @Override
+            public void call(JumpEvent event) {
+                if (mode.getValue() == Mode.VULCAN) {
+                    event.setCancelled(true);
+                }
+            }
+        });
+
     }
 
     @Override
