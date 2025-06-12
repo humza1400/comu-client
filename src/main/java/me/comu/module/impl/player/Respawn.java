@@ -1,4 +1,4 @@
-package me.comu.module.impl.miscellaneous;
+package me.comu.module.impl.player;
 
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.events.TickEvent;
@@ -10,7 +10,7 @@ import java.util.List;
 public class Respawn extends ToggleableModule {
 
     public Respawn() {
-        super("Respawn", List.of("autorespawn"), Category.MISCELLANEOUS, "Automatically respawns for you when you die");
+        super("Respawn", List.of("autorespawn"), Category.PLAYER, "Automatically respawns for you when you die");
         listeners.add(new Listener<>(TickEvent.class) {
             @Override
             public void call(TickEvent event) {

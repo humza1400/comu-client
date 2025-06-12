@@ -146,14 +146,14 @@ public class KillAura extends ToggleableModule {
     @Override
     public void onDisable() {
         super.onDisable();
-        if(isPlayerOrWorldNull(mc)) return;
+        if(isPlayerOrWorldNull()) return;
         target = null;
         shouldReturnToClientRotation = true;
     }
 
     public void onEnable() {
         super.onEnable();
-        if(isPlayerOrWorldNull(mc)) return;
+        if(isPlayerOrWorldNull()) return;
         currentYaw = mc.player.getYaw();
         currentPitch = mc.player.getPitch();
     }

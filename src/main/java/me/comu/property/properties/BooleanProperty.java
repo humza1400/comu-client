@@ -9,6 +9,10 @@ public class BooleanProperty extends Property<Boolean> {
         super(name, aliases, defaultValue);
     }
 
+    public BooleanProperty(String name, boolean defaultValue) {
+        super(name, defaultValue);
+    }
+
     @Override
     public void toggle() {
         value = !value;

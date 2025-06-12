@@ -8,6 +8,10 @@ import me.comu.config.ConfigManager;
 import me.comu.hooks.Hook;
 import me.comu.keybind.KeybindManager;
 import me.comu.module.ModuleManager;
+import me.comu.notification.NotificationManager;
+import me.comu.people.enemy.EnemyManager;
+import me.comu.people.friend.FriendManager;
+import me.comu.people.staff.StaffManager;
 import me.comu.render.HUDRenderer;
 import me.comu.rotation.RotationManager;
 import net.fabricmc.api.ClientModInitializer;
@@ -33,6 +37,10 @@ public class Comu implements ClientModInitializer {
     private CommandManager commandManager;
     private ConfigManager configManager;
     private RotationManager rotationManager;
+    private NotificationManager notificationManager;
+    private FriendManager friendManager;
+    private EnemyManager enemyManager;
+    private StaffManager staffManager;
 
     @Override
     public void onInitializeClient() {
@@ -45,6 +53,11 @@ public class Comu implements ClientModInitializer {
         this.keybindManager = new KeybindManager();
         this.moduleManager = new ModuleManager();
         this.commandManager = new CommandManager();
+        this.rotationManager = new RotationManager();
+        this.notificationManager = new NotificationManager();
+        this.friendManager = new FriendManager();
+        this.enemyManager = new EnemyManager();
+        this.staffManager = new StaffManager();
         this.configManager.loadAll();
 
         // This will be removed soon for our own login api since it's a shitty library.
@@ -90,5 +103,21 @@ public class Comu implements ClientModInitializer {
 
     public RotationManager getRotationManager() {
         return rotationManager;
+    }
+
+    public NotificationManager getNotificationManager() {
+        return notificationManager;
+    }
+
+    public FriendManager getFriendManager() {
+        return friendManager;
+    }
+
+    public EnemyManager getEnemyManager() {
+        return enemyManager;
+    }
+
+    public StaffManager getStaffManager() {
+        return staffManager;
     }
 }

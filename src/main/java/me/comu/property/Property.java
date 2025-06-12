@@ -1,5 +1,6 @@
 package me.comu.property;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Property<T> {
@@ -10,6 +11,12 @@ public abstract class Property<T> {
     public Property(String name, List<String> aliases, T defaultValue) {
         this.name = name;
         this.aliases = aliases;
+        this.value = defaultValue;
+    }
+
+    public Property(String name, T defaultValue) {
+        this.name = name;
+        this.aliases = new ArrayList<>();
         this.value = defaultValue;
     }
 

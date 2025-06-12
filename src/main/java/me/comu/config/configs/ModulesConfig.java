@@ -119,16 +119,20 @@ public class ModulesConfig extends Config {
                     for (var property : module.getProperties()) {
                         if (!props.has(property.getName())) continue;
 
-                        if (property instanceof ListProperty listProp && props.get(property.getName()).isJsonObject()) {
-                            JsonObject nested = props.getAsJsonObject(property.getName());
-                            deserializeListProperty(listProp, nested);
-                        } else {
-                            String value = props.get(property.getName()).getAsString();
-                            Object parsed = PropertyUtils.parseValue(property, value);
-                            PropertyUtils.safelySet(property, parsed);
+                        try {
+                            if (property instanceof ListProperty listProp && props.get(property.getName()).isJsonObject()) {
+                                JsonObject nested = props.getAsJsonObject(property.getName());
+                                deserializeListProperty(listProp, nested);
+                            } else {
+                                String value = props.get(property.getName()).getAsString();
+                                Object parsed = PropertyUtils.parseValue(property, value);
+                                PropertyUtils.safelySet(property, parsed);
+                            }
+                        } catch (Exception e) {
+                            Logger.getLogger().print("[Config] Failed to load property '" + property.getName() + "' for module '" + module.getName() + "'", Logger.LogType.ERROR);
+                            e.printStackTrace();
                         }
                     }
-
                 }
             }
         } catch (Exception e) {

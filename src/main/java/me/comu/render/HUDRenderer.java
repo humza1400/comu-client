@@ -188,8 +188,16 @@ public final class HUDRenderer {
                 int color = switch (theme) {
                     case RAINBOW -> getRainbowColor(y, 0.002f, 0.8f, 1.0f, (alpha >> 24));
                     case COMU -> getComuColor(drawY, rawProgress);
-                    case INDIGO -> getIndigoColor(progress);
-                    case VIRTUE -> getVirtueColor(module.getCategory(), progress);
+                    case INDIGO -> {
+                        float bounce = (float) Math.sin(rawProgress * Math.PI);
+                        int fadeAlpha = getFadeAlpha(!module.isEnabled(), rawProgress);
+                        yield getIndigoColor(bounce, fadeAlpha);
+                    }
+                    case VIRTUE -> {
+                        float bounce = (float) Math.sin(rawProgress * Math.PI);
+                        boolean isDisabling = rawProgress < 1f && !module.isEnabled();
+                        yield getVirtueColor(module.getCategory(), bounce, rawProgress, isDisabling);
+                    }
                     case GRAYSCALE -> (alpha & 0xFF000000) | 0x666666;
                     case WHITE -> (alpha & 0xFF000000) | 0xFFFFFF;
                     default -> (alpha & 0xFF000000) | 0xFFFFFF;
@@ -222,6 +230,8 @@ public final class HUDRenderer {
 
         if (hud.getGapple().getValue()) drawGappled(context, screenWidth, screenHeight);
         if (hud.getArmor().getValue()) drawArmor(context, screenWidth, screenHeight);
+
+        Comu.getInstance().getNotificationManager().render(context);
     }
 
     private static int drawPotions(DrawContext context, int screenWidth, int yOffset) {
@@ -441,13 +451,12 @@ public final class HUDRenderer {
         return (alpha << 24) | rgb;
     }
 
-    public static int getIndigoColor(float progress) {
+    public static int getIndigoColor(float bounceProgress, int alpha) {
         double ratio = indigoFadeState / 25.0;
         int fadeHex = getFadeHex(-23614, -3394561, ratio);
-        int alpha = Math.max(10, Math.min(255, (int) (255 * progress)));
-
         return (alpha << 24) | (fadeHex & 0x00FFFFFF);
     }
+
 
     public static void updateIndigoFadeState() {
         if (indigoFadeState >= 25 || indigoFadeState <= 0) indigoGoingUp = !indigoGoingUp;
@@ -466,13 +475,16 @@ public final class HUDRenderer {
         return (r << 16) | (g << 8) | b;
     }
 
-    public static int getVirtueColor(Category category, float progress) {
-        int alpha = Math.max(10, Math.min(255, (int)(255 * progress)));
+    public static int getVirtueColor(Category category, float bounceProgress, float rawProgress, boolean isDisabling) {
+        float bounce = (float) Math.sin(bounceProgress * Math.PI);
+        if (isDisabling) bounce = 1f - bounce;
+
+        int alpha = getFadeAlpha(isDisabling, rawProgress);
         int baseColor;
 
         switch (category) {
             case COMBAT -> baseColor = 0xFFFA5551;
-            case EXPLOITS -> baseColor = 0x5CCEFF;
+            case PLAYER -> baseColor = 0x5CCEFF;
             case MOVEMENT -> baseColor = 0x77A7F7;
             case MISCELLANEOUS -> baseColor = 0xB4FFAC;
             case RENDER -> baseColor = 0xFFFFFFFF;
@@ -482,5 +494,6 @@ public final class HUDRenderer {
 
         return (alpha << 24) | (baseColor & 0x00FFFFFF);
     }
+
 
 }

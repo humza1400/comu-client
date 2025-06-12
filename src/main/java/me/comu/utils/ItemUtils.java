@@ -1,5 +1,6 @@
 package me.comu.utils;
 
+import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.enchantment.Enchantment;
@@ -8,6 +9,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
@@ -18,6 +20,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class ItemUtils {
+
+    private static MinecraftClient mc = MinecraftClient.getInstance();
 
     private static final List<String> ENCHANTMENT_PRIORITY_LIST = List.of(
             "sharpness",
@@ -128,6 +132,15 @@ public class ItemUtils {
         };
     }
 
+    public static ItemStack getHeldItem() {
+        return mc.player != null ? mc.player.getMainHandStack() : ItemStack.EMPTY;
+    }
+
+    public static boolean isHeldItemInstanceOf(Item item) {
+        ItemStack heldItem = getHeldItem();
+        return !heldItem.isEmpty() && heldItem.isOf(item);
+    }
+
     public static int getEnchantmentLevel(RegistryKey<Enchantment> enchantmentKey, ItemStack stack) {
         ItemEnchantmentsComponent enchantments = stack.getOrDefault(DataComponentTypes.ENCHANTMENTS, ItemEnchantmentsComponent.DEFAULT);
 
@@ -171,5 +184,9 @@ public class ItemUtils {
 
     public static boolean isPunch2OrBetter(ItemStack stack) {
         return getEnchantmentLevel(Enchantments.PUNCH, stack) >= 2;
+    }
+
+    public static boolean isPunch3OrBetter(ItemStack stack) {
+        return getEnchantmentLevel(Enchantments.PUNCH, stack) >= 3;
     }
 }

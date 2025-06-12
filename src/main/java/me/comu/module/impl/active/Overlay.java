@@ -1,15 +1,22 @@
 package me.comu.module.impl.active;
 
 import me.comu.Comu;
+import me.comu.api.registry.event.Event;
 import me.comu.api.registry.event.listener.Listener;
+import me.comu.events.Render2DEvent;
 import me.comu.events.TickEvent;
 import me.comu.hooks.Hook;
+import me.comu.logging.Logger;
 import me.comu.module.Category;
 import me.comu.module.Module;
 import me.comu.property.properties.BooleanProperty;
 import me.comu.property.properties.ListProperty;
 import me.comu.property.properties.NumberProperty;
+import me.comu.utils.RenderUtils;
 import net.minecraft.client.option.Perspective;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.hit.HitResult;
+import net.minecraft.util.math.BlockPos;
 
 import java.util.List;
 
@@ -66,6 +73,17 @@ public class Overlay extends Module {
                     }
 
                 }
+            }
+        });
+
+        Comu.getInstance().getEventManager().register(new Listener<>(Render2DEvent.class) {
+            @Override
+            public void call(Render2DEvent event) {
+                    if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+                        BlockHitResult hit = (BlockHitResult) mc.crosshairTarget;
+                        BlockPos pos = hit.getBlockPos();
+                        RenderUtils.drawBlockOverlay(event.getContext(), pos, event.getTickDelta());
+                    }
             }
         });
     }

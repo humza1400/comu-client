@@ -117,7 +117,7 @@ public class Speed extends ToggleableModule {
     @Override
     public void onEnable() {
         super.onEnable();
-        if (isPlayerOrWorldNull(mc)) {
+        if (isPlayerOrWorldNull()) {
             return;
         }
         mc.options.getFovEffectScale().setValue(Math.min(1.0, Math.max(0.0, 0.0)));
@@ -126,7 +126,7 @@ public class Speed extends ToggleableModule {
     @Override
     public void onDisable() {
         super.onDisable();
-        if (isPlayerOrWorldNull(mc)) {
+        if (isPlayerOrWorldNull()) {
             return;
         }
         EntityAttributeInstance attribute = mc.player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);

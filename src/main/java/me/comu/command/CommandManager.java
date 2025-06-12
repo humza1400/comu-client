@@ -23,6 +23,12 @@ public class CommandManager extends Registry<Command> {
         register(new Modules());
         register(new Rename());
         register(new Visible());
+        register(new Friend.Add());
+        register(new Friend.Remove());
+        register(new Enemy.Add());
+        register(new Enemy.Remove());
+        register(new Staff.Add());
+        register(new Staff.Remove());
 
         // Network
 
@@ -77,12 +83,7 @@ public class CommandManager extends Registry<Command> {
     }
 
     public Command getCommandByName(String name) {
-        return registry.stream()
-                .filter(command ->
-                        command.getName().equalsIgnoreCase(name) ||
-                                command.getAliases().stream().anyMatch(alias -> alias.equalsIgnoreCase(name)))
-                .findFirst()
-                .orElse(null);
+        return registry.stream().filter(command -> command.getName().equalsIgnoreCase(name) || command.getAliases().stream().anyMatch(alias -> alias.equalsIgnoreCase(name))).findFirst().orElse(null);
     }
 
     private static String applyDefaultColor(String message) {

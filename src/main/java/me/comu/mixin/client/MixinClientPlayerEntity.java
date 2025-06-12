@@ -1,8 +1,12 @@
 package me.comu.mixin.client;
 
+import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.comu.Comu;
 import me.comu.events.MotionEvent;
 import me.comu.events.MoveEvent;
+import me.comu.logging.Logger;
+import me.comu.module.ToggleableModule;
+import me.comu.module.impl.movement.NoSlowdown;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.Perspective;
@@ -106,5 +110,12 @@ public abstract class MixinClientPlayerEntity {
         } else {
             self.setVelocity(event.getMovement());
         }
+    }
+
+    @ModifyExpressionValue(method = "applyMovementSpeedFactors", at = @At(value = "INVOKE", target = "Lnet/minecraft/client/network/ClientPlayerEntity;isUsingItem()Z"))
+    private boolean redirectUsingItem(boolean isUsingItem) {
+        NoSlowdown noSlow = Comu.getInstance().getModuleManager().getModule(NoSlowdown.class);
+        if (noSlow.isEnabled()) return false;
+        return isUsingItem;
     }
 }

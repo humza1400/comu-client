@@ -1,5 +1,6 @@
 package me.comu.module.impl.render;
 
+import me.comu.Comu;
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.events.Render2DEvent;
 import me.comu.mixin.render.accessor.GameRendererAccessor;
@@ -7,15 +8,15 @@ import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.BooleanProperty;
 import me.comu.property.properties.EnumProperty;
-import me.comu.utils.ClientUtils;
 import me.comu.utils.ItemUtils;
 import me.comu.utils.RenderUtils;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.entity.EquipmentSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.MutableText;
+import net.minecraft.text.Style;
 import net.minecraft.text.Text;
+import net.minecraft.text.TextColor;
 import net.minecraft.util.Formatting;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
@@ -143,7 +144,7 @@ public class Nametags extends ToggleableModule {
         for (int i = 0; i < items.size(); i++) {
             ItemStack stack = items.get(i);
             int omegaColor = ItemUtils.hasCurseOfVanishing(stack) ? 0x1d1f1d : 0xFF1706;
-            boolean isOmegaOrSimilar = ItemUtils.isOmega(stack) || ItemUtils.isPurpleGodSword(stack) || ItemUtils.isPunch2OrBetter(stack);
+            boolean isOmegaOrSimilar = ItemUtils.isOmega(stack) || ItemUtils.isPurpleGodSword(stack) || ItemUtils.isPunch3OrBetter(stack);
             float x = startX + i * iconSpacing;
 
             RenderUtils.drawItem(context, stack, (int) x, (int) yOffset, 1f, true);
@@ -188,22 +189,32 @@ public class Nametags extends ToggleableModule {
     }
 
     private Text getDisplayName(PlayerEntity player) {
-        MutableText name = player.getDisplayName().copy();
+        String nameStr = player.getName().getString();
+        MutableText name;
 
-        if (player.getName().getString().equals(mc.getSession().getUsername())) {
-            name = Text.literal("You");
+        TextColor color = TextColor.parse("#AAAAAA").result().orElse(TextColor.fromRgb(0xAAAAAA));
+        String displayText = nameStr;
+
+        if (nameStr.equals(mc.getSession().getUsername())) {
+            displayText = "You";
         }
 
-//        if (Comu.getInstance().getFriendManager().isFriend(player.getName())) {
-//            name = Comu.getInstance().getFriendManager().getFriendByAliasOrLabel(player.getName()).getAlias();
-//        }
-//
-//        if (Comu.getInstance().getEnemyManager().isEnemy(player.getName())) {
-//            name = Comu.getInstance().getEnemyManager().getEnemyByAliasOrLabel(player.getName()).getAlias();
-//        }
-//        if (Comu.getInstance().getStaffManager().isStaff((player.getName()))) {
-//            name = Comu.getInstance().getStaffManager().getStaffByAliasOrLabel(player.getName()).getAlias();
-//        }
+        if (Comu.getInstance().getFriendManager().isFriend(nameStr)) {
+            displayText = Comu.getInstance().getFriendManager().getByNameOrAlias(nameStr).getAlias();
+            color = TextColor.parse("#55C0ED").result().orElse(TextColor.fromRgb(0x55C0ED));
+        } else if (player.isInvisible()) {
+            color = TextColor.parse("#ef0147").result().orElse(TextColor.fromRgb(0xef0147));
+        } else if (player.isSneaking()) {
+            color = TextColor.parse("#9d1995").result().orElse(TextColor.fromRgb(0x9d1995));
+        } else if (Comu.getInstance().getEnemyManager().isEnemy(nameStr)) {
+            displayText = Comu.getInstance().getEnemyManager().getEnemyByNameOrAlias(nameStr).getAlias();
+            color = TextColor.parse("#f442e8").result().orElse(TextColor.fromRgb(0xf442e8));
+        } else if (Comu.getInstance().getStaffManager().isStaff(nameStr)) {
+            displayText = Comu.getInstance().getStaffManager().getStaffByNameOrAlias(nameStr).getAlias();
+            color = TextColor.parse("#FFDD2E").result().orElse(TextColor.fromRgb(0xFFDD2E));
+        }
+
+        name = Text.literal(displayText).setStyle(Style.EMPTY.withColor(color));
 
         if (ping.getValue()) {
             int pingInt = mc.getNetworkHandler().getPlayerListEntry(player.getUuid()) != null ? mc.getNetworkHandler().getPlayerListEntry(player.getUuid()).getLatency() : -1;
@@ -212,19 +223,19 @@ public class Nametags extends ToggleableModule {
 
 
         float health = player.getHealth();
-        Formatting color;
+        Formatting healthColor;
         if (health > 18) {
-            color = Formatting.GREEN;
+            healthColor = Formatting.GREEN;
         } else if (health > 16) {
-            color = Formatting.DARK_GREEN;
+            healthColor = Formatting.DARK_GREEN;
         } else if (health > 12) {
-            color = Formatting.YELLOW;
+            healthColor = Formatting.YELLOW;
         } else if (health > 8) {
-            color = Formatting.GOLD;
+            healthColor = Formatting.GOLD;
         } else if (health > 5) {
-            color = Formatting.RED;
+            healthColor = Formatting.RED;
         } else {
-            color = Formatting.DARK_RED;
+            healthColor = Formatting.DARK_RED;
         }
 
         if (this.health.getValue()) {
@@ -235,10 +246,10 @@ public class Nametags extends ToggleableModule {
             };
 
             String healthText = (health > 0 ? (int) displayHealth + (healthLook.getValue() == HealthLook.PERCENT ? "%" : "") : "Dead");
-            name.append(Text.literal(" " + healthText).formatted(color));
+            name.append(Text.literal(" " + healthText).formatted(healthColor));
 
             if (heart.getValue()) {
-                name.append(Text.literal(" ❤").formatted(color));
+                name.append(Text.literal(" ❤").formatted(healthColor));
             }
         }
 
@@ -250,4 +261,6 @@ public class Nametags extends ToggleableModule {
 
         return name;
     }
+
+
 }

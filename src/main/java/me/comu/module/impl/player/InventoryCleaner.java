@@ -1,4 +1,4 @@
-package me.comu.module.impl.miscellaneous;
+package me.comu.module.impl.player;
 
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.api.stopwatch.Stopwatch;
@@ -25,7 +25,7 @@ public class InventoryCleaner extends ToggleableModule {
     }
 
     public InventoryCleaner() {
-        super("Inventory Cleaner", List.of("invcleaner", "inventorycleaner", "invclean"), Category.MISCELLANEOUS, "Automatically drops items in your inventory for you");
+        super("Inventory Cleaner", List.of("invcleaner", "inventorycleaner", "invclean"), Category.PLAYER, "Automatically drops items in your inventory for you");
         offerProperties(delay, mode);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override

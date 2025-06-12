@@ -4,8 +4,9 @@ import me.comu.api.registry.Registry;
 import me.comu.module.impl.active.Overlay;
 import me.comu.module.impl.combat.KillAura;
 import me.comu.module.impl.miscellaneous.ChatSpammer;
-import me.comu.module.impl.miscellaneous.InventoryCleaner;
-import me.comu.module.impl.miscellaneous.Respawn;
+import me.comu.module.impl.miscellaneous.MiddleClickPerson;
+import me.comu.module.impl.player.InventoryCleaner;
+import me.comu.module.impl.player.Respawn;
 import me.comu.module.impl.movement.*;
 import me.comu.module.impl.render.*;
 import me.comu.module.impl.world.Timer;
@@ -30,6 +31,7 @@ public class ModuleManager extends Registry<Module> {
         register(new ChatSpammer());
         register(new Respawn());
         register(new InventoryCleaner());
+        register(new MiddleClickPerson());
 
         // Movement
         register(new Sprint());

@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public enum Category {
-    COMBAT("Combat"), EXPLOITS("Exploits"), MISCELLANEOUS("Miscellaneous"), MOVEMENT("Movement"), RENDER("Render"), WORLD("World"), PERSISTENT("Persistent", false), CONFIG("Config", false);
+    COMBAT("Combat"), PLAYER("Player"), MISCELLANEOUS("Miscellaneous"), MOVEMENT("Movement"), RENDER("Render"), WORLD("World"), PERSISTENT("Persistent", false), CONFIG("Config", false);
 
     private final String name;
     private final boolean isToggleableCategory;

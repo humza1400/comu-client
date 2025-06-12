@@ -95,8 +95,8 @@ public abstract class Module {
         return properties;
     }
 
-    protected boolean isPlayerOrWorldNull(MinecraftClient mc) {
-        return mc.player == null && mc.world == null;
+    protected boolean isPlayerOrWorldNull() {
+        return mc.player == null || mc.world == null;
     }
 
     @Override

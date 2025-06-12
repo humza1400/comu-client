@@ -1,6 +1,7 @@
 package me.comu.config;
 
 import me.comu.config.configs.ModulesConfig;
+import me.comu.config.configs.PeopleConfig;
 import me.comu.logging.Logger;
 
 import java.io.File;
@@ -16,6 +17,7 @@ public class ConfigManager {
         if (!configDir.exists()) configDir.mkdirs();
 
         register(new ModulesConfig(baseDirectory));
+        register(new PeopleConfig(baseDirectory));
     }
 
     public void register(Config config) {
