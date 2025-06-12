@@ -1,16 +1,16 @@
 package me.comu.module.impl.movement;
 
 import me.comu.api.registry.event.listener.Listener;
+import me.comu.ducks.PlayerMovePacketDuck;
 import me.comu.events.JumpEvent;
 import me.comu.events.MotionEvent;
+import me.comu.events.MoveEvent;
 import me.comu.events.PacketEvent;
-import me.comu.ducks.PlayerMovePacketDuck;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.EnumProperty;
 import me.comu.property.properties.NumberProperty;
-import me.comu.utils.ClientUtils;
-import me.comu.utils.MovementUtils;
+import me.comu.utils.MoveUtils;
 import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
@@ -26,19 +26,18 @@ public class Speed extends ToggleableModule {
     EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VULCAN);
 
     public enum Mode {
-        VULCAN, MODZ
+        VULCAN, MODZ, TEST
     }
 
     public Speed() {
         super("Speed", List.of(), Category.MOVEMENT, "You Go Zoooom");
         offerProperties(speed, mode);
-        setSuffix(mode.getFormattedValue());
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
                 switch (mode.getValue()) {
                     case MODZ:
-                        if (ClientUtils.isMoving()) {
+                        if (MoveUtils.isMoving()) {
                             Vec3d velocity = mc.player.getVelocity();
                             EntityAttributeInstance attribute = mc.player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
                             attribute.setBaseValue(speed.getValue());
@@ -50,7 +49,7 @@ public class Speed extends ToggleableModule {
                     case VULCAN:
                         EntityAttributeInstance attribute = mc.player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
 
-                        if (!ClientUtils.isMoving() || !mc.player.verticalCollision || mc.player.isHoldingOntoLadder())
+                        if (!MoveUtils.isMoving() || !mc.player.verticalCollision || mc.player.isHoldingOntoLadder())
                             return;
 
                         float speed;
@@ -63,14 +62,14 @@ public class Speed extends ToggleableModule {
                             int amplifier = effect != null ? effect.getAmplifier() : 0;
 
                             speed = (amplifier > 0) ? potionSpeed : normalSpeed;
-                            MovementUtils.setStrafe(speed);
+                            MoveUtils.setStrafe(speed);
                         } else if (mc.player.sidewaysSpeed != 0) {
                             speed = strafeSpeed;
                         } else {
                             speed = normalSpeed;
                         }
 
-                        MovementUtils.setStrafe(speed);
+                        MoveUtils.setStrafe(speed);
 
                         double randomOffset = 0.0045 + Math.random() * 0.001;
                         mc.player.setVelocity(mc.player.getVelocity().x, randomOffset, mc.player.getVelocity().z);
@@ -99,6 +98,20 @@ public class Speed extends ToggleableModule {
             }
         });
 
+
+        listeners.add(new Listener<>(MoveEvent.class) {
+            @Override
+            public void call(MoveEvent event) {
+                if (mode.getValue() == Mode.TEST && MoveUtils.isMoving()) {
+                    Vec3d movement = event.getMovement();
+                    Vec3d direction = movement.normalize().multiply(2);
+//                    event.setMotionX(2);
+//                    event.setMotionZ(2);
+                    event.setMovement(direction);
+                }
+            }
+        });
+
     }
 
     @Override
@@ -119,5 +132,10 @@ public class Speed extends ToggleableModule {
         EntityAttributeInstance attribute = mc.player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
         attribute.setBaseValue(0.1);
         mc.options.getFovEffectScale().setValue(Math.min(1.0, Math.max(0.0, 1.0)));
+    }
+
+    @Override
+    public String getSuffix() {
+        return mode.getFormattedValue();
     }
 }

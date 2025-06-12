@@ -6,7 +6,6 @@
 		"client.MixinClientPlayerEntity",
 		"client.MixinClientConnection",
 		"entity.MixinPlayerEntity",
-		"entity.MixinLivingEntity",
 		"io.MixinKeyboard",
 		"io.MixinKeyboardInput",
 		"io.MixinMouse",

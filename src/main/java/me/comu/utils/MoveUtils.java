@@ -5,10 +5,17 @@ import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.util.math.Vec2f;
 import net.minecraft.util.math.Vec3d;
 
-public class MovementUtils {
+public class MoveUtils {
+
+    private static MinecraftClient mc = MinecraftClient.getInstance();
+
+
+    public static boolean isMoving() {
+        assert mc.player != null;
+        return mc.player.input.getMovementInput().x != 0.0f || mc.player.input.getMovementInput().y != 0.0f;
+    }
 
     public static void setMoveSpeedFly(double speed, double motionY) {
-        MinecraftClient mc = MinecraftClient.getInstance();
         ClientPlayerEntity player = mc.player;
 
         if (player == null) return;
@@ -49,7 +56,6 @@ public class MovementUtils {
     }
 
     public static void setMoveSpeed(double speed) {
-        MinecraftClient mc = MinecraftClient.getInstance();
         ClientPlayerEntity player = mc.player;
 
         if (player == null) return;
@@ -90,7 +96,6 @@ public class MovementUtils {
     }
 
     public static void setStrafe(float speed) {
-        MinecraftClient mc = MinecraftClient.getInstance();
         ClientPlayerEntity player = mc.player;
         if (player == null) return;
 

@@ -3,26 +3,10 @@ package me.comu.utils;
 import me.comu.Comu;
 import me.comu.render.Renderer2D;
 import net.minecraft.client.MinecraftClient;
-import net.minecraft.component.DataComponentTypes;
-import net.minecraft.component.type.ItemEnchantmentsComponent;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.entity.EquipmentSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
 import net.minecraft.network.packet.Packet;
-import net.minecraft.registry.Registries;
-import net.minecraft.registry.Registry;
-import net.minecraft.registry.RegistryKey;
-import net.minecraft.registry.entry.RegistryEntry;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Box;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 public class ClientUtils {
 
@@ -67,11 +51,6 @@ public class ClientUtils {
             return;
         }
         mc.getNetworkHandler().sendPacket(packet);
-    }
-
-    public static boolean isMoving() {
-        assert mc.player != null;
-        return mc.player.input.getMovementInput().x != 0.0f || mc.player.input.getMovementInput().y != 0.0f;
     }
 
     public static boolean isOnGround(double height) {

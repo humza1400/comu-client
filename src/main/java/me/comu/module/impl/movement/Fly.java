@@ -6,17 +6,13 @@ import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.EnumProperty;
 import me.comu.property.properties.NumberProperty;
-import me.comu.utils.MovementUtils;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
+import me.comu.utils.MoveUtils;
 
 import java.util.List;
 
 public class Fly extends ToggleableModule {
 
-    private NumberProperty<Integer> speed = new NumberProperty<Integer>("Speed", List.of("fs", "s"), 1, 1, 10, 1);
+    private NumberProperty<Integer> speed = new NumberProperty<>("Speed", List.of("fs", "s"), 1, 1, 10, 1);
     private EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VANILLA);
 
     public Fly() {
@@ -32,9 +28,9 @@ public class Fly extends ToggleableModule {
                         if (mc.player != null && mc.world != null) {
                             mc.player.getAbilities().flying = false;
                             if (!mc.options.sneakKey.isPressed())
-                                MovementUtils.setMoveSpeedFly(speed.getValue(), mc.options.jumpKey.isPressed() ? 0.3f : 0);
+                                MoveUtils.setMoveSpeedFly(speed.getValue(), mc.options.jumpKey.isPressed() ? 0.3f : 0);
                             if (mc.options.sneakKey.isPressed())
-                                MovementUtils.setMoveSpeedFly(speed.getValue(), -0.3F);
+                                MoveUtils.setMoveSpeedFly(speed.getValue(), -0.3F);
                         }
                         return;
                         case VANILLA:

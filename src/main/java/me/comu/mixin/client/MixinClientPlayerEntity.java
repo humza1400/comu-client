@@ -1,11 +1,15 @@
 package me.comu.mixin.client;
 
+import me.comu.Comu;
 import me.comu.events.MotionEvent;
+import me.comu.events.MoveEvent;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.option.Perspective;
+import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -89,5 +93,18 @@ public abstract class MixinClientPlayerEntity {
         }
 
         motionEvent.setPhase(MotionEvent.Phase.POST).dispatch();
+    }
+
+    @Inject(method = "tickMovement", at = @At("HEAD"))
+    private void onTickMovement(CallbackInfo ci) {
+        Entity self = (Entity) (Object) this;
+        MoveEvent event = new MoveEvent(self.getVelocity());
+        Comu.getInstance().getEventManager().dispatch(event);
+
+        if (event.isCancelled()) {
+            self.setVelocity(Vec3d.ZERO);
+        } else {
+            self.setVelocity(event.getMovement());
+        }
     }
 }

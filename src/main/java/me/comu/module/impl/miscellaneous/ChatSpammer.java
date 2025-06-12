@@ -2,19 +2,12 @@ package me.comu.module.impl.miscellaneous;
 
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.api.stopwatch.Stopwatch;
-import me.comu.events.MotionEvent;
 import me.comu.events.TickEvent;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.BooleanProperty;
-import me.comu.property.properties.EnumProperty;
 import me.comu.property.properties.InputProperty;
 import me.comu.property.properties.NumberProperty;
-import me.comu.utils.MovementUtils;
-import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
-import net.minecraft.util.math.Vec2f;
-import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 import java.util.concurrent.ThreadLocalRandom;

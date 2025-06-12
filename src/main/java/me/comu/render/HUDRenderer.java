@@ -7,7 +7,6 @@ import me.comu.module.ToggleableModule;
 import me.comu.module.impl.render.HUD;
 import me.comu.module.impl.render.TabGui;
 import me.comu.module.impl.render.tabgui.comu.ComuTabGui;
-import me.comu.utils.ClientUtils;
 import me.comu.utils.ItemUtils;
 import me.comu.utils.RenderUtils;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -477,7 +476,7 @@ public final class HUDRenderer {
             case MOVEMENT -> baseColor = 0x77A7F7;
             case MISCELLANEOUS -> baseColor = 0xB4FFAC;
             case RENDER -> baseColor = 0xFFFFFFFF;
-            case WORLD -> baseColor = 0xF7A72E;
+            case WORLD -> baseColor = 0xE4D5B7;
             default -> baseColor = 0xCCCCCC;
         }
 

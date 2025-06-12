@@ -2,16 +2,13 @@ package me.comu.module.impl.active;
 
 import me.comu.Comu;
 import me.comu.api.registry.event.listener.Listener;
-import me.comu.events.MotionEvent;
 import me.comu.events.TickEvent;
 import me.comu.hooks.Hook;
-import me.comu.logging.Logger;
 import me.comu.module.Category;
 import me.comu.module.Module;
 import me.comu.property.properties.BooleanProperty;
 import me.comu.property.properties.ListProperty;
 import me.comu.property.properties.NumberProperty;
-import me.comu.utils.MovementUtils;
 import net.minecraft.client.option.Perspective;
 
 import java.util.List;

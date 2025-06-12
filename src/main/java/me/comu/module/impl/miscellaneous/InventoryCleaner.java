@@ -7,9 +7,7 @@ import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.EnumProperty;
 import me.comu.property.properties.NumberProperty;
-import me.comu.utils.ClientUtils;
 import me.comu.utils.ItemUtils;
-import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.*;
 import net.minecraft.screen.slot.Slot;
 import net.minecraft.screen.slot.SlotActionType;
@@ -29,7 +27,6 @@ public class InventoryCleaner extends ToggleableModule {
     public InventoryCleaner() {
         super("Inventory Cleaner", List.of("invcleaner", "inventorycleaner", "invclean"), Category.MISCELLANEOUS, "Automatically drops items in your inventory for you");
         offerProperties(delay, mode);
-        setSuffix(mode.getFormattedValue());
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
@@ -60,5 +57,10 @@ public class InventoryCleaner extends ToggleableModule {
                 }
             }
         });
+    }
+
+    @Override
+    public String getSuffix() {
+        return mode.getFormattedValue();
     }
 }

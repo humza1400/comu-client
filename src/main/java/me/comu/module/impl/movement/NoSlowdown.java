@@ -1,14 +1,12 @@
 package me.comu.module.impl.movement;
 
-import me.comu.api.registry.event.Event;
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.events.MotionEvent;
-import me.comu.logging.Logger;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.EnumProperty;
-import me.comu.property.properties.NumberProperty;
 import me.comu.utils.ClientUtils;
+import me.comu.utils.MoveUtils;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.util.Hand;
@@ -35,7 +33,7 @@ public class NoSlowdown extends ToggleableModule {
                 switch (mode.getValue()) {
                     case OLD:
                         if (mc.player.isUsingItem()) {
-                            if (ClientUtils.isMoving()) {
+                            if (MoveUtils.isMoving()) {
                                 switch (event.getPhase()) {
                                     case PRE:
                                         mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
@@ -52,7 +50,7 @@ public class NoSlowdown extends ToggleableModule {
                         }
                         break;
                     case NCP:
-                        if (mc.player.isUsingItem() && ClientUtils.isMoving() && ClientUtils.isOnGround(0.42)) {
+                        if (mc.player.isUsingItem() && MoveUtils.isMoving() && ClientUtils.isOnGround(0.42)) {
                             if (event.getPhase() == MotionEvent.Phase.PRE) {
                                 mc.player.networkHandler.sendPacket(new PlayerActionC2SPacket(PlayerActionC2SPacket.Action.RELEASE_USE_ITEM, BlockPos.ORIGIN, Direction.DOWN));
                             } else if (event.getPhase() == MotionEvent.Phase.POST) {

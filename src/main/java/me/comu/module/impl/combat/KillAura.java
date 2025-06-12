@@ -47,7 +47,6 @@ public class KillAura extends ToggleableModule {
     public KillAura() {
         super("Kill Aura", List.of("killaura","aura", "ka"), Category.COMBAT, "Attacks any valid targets within reach");
         offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack, delta, smooth);
-        setSuffix(mode.getFormattedValue());
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
@@ -275,4 +274,8 @@ public class KillAura extends ToggleableModule {
         return wrapped;
     }
 
+    @Override
+    public String getSuffix() {
+        return mode.getFormattedValue();
+    }
 }
