@@ -2,14 +2,19 @@ package me.comu.utils;
 
 import com.mojang.blaze3d.systems.ProjectionType;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.VertexFormat;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.*;
+import net.minecraft.client.render.Camera;
+import net.minecraft.client.render.RenderLayer;
+import net.minecraft.client.render.VertexConsumer;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
 
@@ -92,8 +97,48 @@ public class RenderUtils {
         drawLine(buffer, box.minX, box.maxY, box.minZ, box.maxX, box.maxY, box.minZ, r, g, b, alpha);
     }
 
-    private static void drawLine(VertexConsumer buffer, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b, float a) {
+    public static void drawLine(VertexConsumer buffer, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b, float a) {
         buffer.vertex((float) x1, (float) y1, (float) z1).color(r, g, b, a).normal(0, 1, 0);
         buffer.vertex((float) x2, (float) y2, (float) z2).color(r, g, b, a).normal(0, 1, 0);
+    }
+
+    public static void drawGradientRect(DrawContext context, int x, int y, int width, int height, int topColor, int bottomColor) {
+        for (int i = 0; i < height; i++) {
+            float ratio = (float) i / height;
+            int r = (int) MathHelper.lerp(ratio, (topColor >> 16) & 0xFF, (bottomColor >> 16) & 0xFF);
+            int g = (int) MathHelper.lerp(ratio, (topColor >> 8) & 0xFF, (bottomColor >> 8) & 0xFF);
+            int b = (int) MathHelper.lerp(ratio, topColor & 0xFF, bottomColor & 0xFF);
+            int color = (255 << 24) | (r << 16) | (g << 8) | b;
+            context.fill(x, y + i, x + width, y + i + 1, color);
+        }
+    }
+
+    public static void drawHollowRect(DrawContext context, int x, int y, int width, int height, int color) {
+        context.fill(x, y, x + width, y + 1, color);
+        context.fill(x, y + height - 1, x + width, y + height, color);
+        context.fill(x, y, x + 1, y + height, color);
+        context.fill(x + width - 1, y, x + width, y + height, color);
+    }
+
+    public static void drawEnhancedText(DrawContext context, TextRenderer textRenderer, Text text, int x, int y, float hoverProgress, float animationTime) {
+        String textString = text.getString();
+
+        int shadowColor = (int) (100 + hoverProgress * 50) << 24;
+        context.drawText(textRenderer, textString, x - textRenderer.getWidth(textString) / 2 + 1, y + 1, shadowColor, false);
+
+        float textWave = (float) Math.sin(animationTime * 1.5) * 0.1f + 0.9f;
+        int textR = (int) (255 * textWave);
+        int textG = (int) (255 * (0.9f + hoverProgress * 0.1f));
+        int textB = (int) (200 + hoverProgress * 55);
+        int textColor = (255 << 24) | (textR << 16) | (textG << 8) | textB;
+
+        float textOffset = (float) Math.sin(animationTime * 2) * hoverProgress * 0.5f;
+        context.drawText(textRenderer, textString, x - textRenderer.getWidth(textString) / 2, (int) (y + textOffset), textColor, false);
+
+        if (hoverProgress > 0.5f) {
+            int glowAlpha = (int) ((hoverProgress - 0.5f) * 60);
+            int glowColor = (glowAlpha << 24) | 0xFFFFFF;
+            context.drawText(textRenderer, textString, x - textRenderer.getWidth(textString) / 2, y, glowColor, false);
+        }
     }
 }

@@ -26,7 +26,8 @@
 		"render.MixinEntityRenderer",
 		"render.MixinGameRenderer",
 		"render.MixinInGameHud",
-		"render.MixinCamera"
+		"render.MixinCamera",
+		"render.MixinTitleScreen"
 
 	],
 	"injectors": {

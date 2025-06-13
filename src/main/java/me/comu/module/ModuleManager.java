@@ -2,6 +2,7 @@ package me.comu.module;
 
 import me.comu.api.registry.Registry;
 import me.comu.module.impl.active.Overlay;
+import me.comu.module.impl.combat.AutoPotion;
 import me.comu.module.impl.combat.KillAura;
 import me.comu.module.impl.miscellaneous.ChatSpammer;
 import me.comu.module.impl.miscellaneous.MiddleClickPerson;
@@ -24,6 +25,7 @@ public class ModuleManager extends Registry<Module> {
 
         // Combat
         register(new KillAura());
+        register(new AutoPotion());
 
         // Exploits
 

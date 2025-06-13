@@ -1,8 +1,10 @@
 package me.comu.utils;
 
+import me.comu.logging.Logger;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
+import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
@@ -12,6 +14,8 @@ import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.potion.Potion;
+import net.minecraft.potion.Potions;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
 
@@ -188,5 +192,33 @@ public class ItemUtils {
 
     public static boolean isPunch3OrBetter(ItemStack stack) {
         return getEnchantmentLevel(Enchantments.PUNCH, stack) >= 3;
+    }
+
+    public static int getPotCount() {
+        if (mc.player == null) return 0;
+
+        int count = 0;
+
+        for (int i = 0; i < mc.player.getInventory().size(); i++) {
+            ItemStack stack = mc.player.getInventory().getStack(i);
+            if (isSplashHealthPotion(stack)) {
+                count += stack.getCount();
+            }
+        }
+
+        return count;
+    }
+
+    public static boolean isSplashHealthPotion(ItemStack stack) {
+        if (stack.getItem() != Items.SPLASH_POTION) return false;
+
+        PotionContentsComponent potionComponent = stack.get(DataComponentTypes.POTION_CONTENTS);
+        if (potionComponent == null) return false;
+
+        RegistryEntry<Potion> potionEntry = potionComponent.potion().orElse(null);
+        if (potionEntry == null) return false;
+
+        Potion potion = potionEntry.value();
+        return potion.getBaseName().equalsIgnoreCase(Potions.HEALING.getIdAsString().replaceFirst("minecraft:", "")) || potion.getBaseName().equalsIgnoreCase(Potions.STRONG_HEALING.getIdAsString().replaceFirst("minecraft:", ""));
     }
 }

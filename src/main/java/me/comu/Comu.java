@@ -1,6 +1,5 @@
 package me.comu;
 
-import me.comu.account.MicrosoftLogin;
 import me.comu.api.registry.event.EventManager;
 import me.comu.api.registry.event.IEventManager;
 import me.comu.command.CommandManager;
