@@ -32,7 +32,6 @@ public class Velocity extends ToggleableModule {
         NCP, VULCAN,
     }
 
-
     public Velocity() {
         super("Velocity", List.of("antivelocity", "vel", "antikb"), Category.MOVEMENT, "Modifies how much velocity you take");
         offerProperties(percent, transactionDelay, bowboost, mode, debug);
@@ -70,7 +69,7 @@ public class Velocity extends ToggleableModule {
                         }
 
                         case VULCAN -> {
-                            // Add Vulcan-specific logic here if needed
+                            
                         }
                     }
                 }
@@ -84,7 +83,7 @@ public class Velocity extends ToggleableModule {
     }
 
     @Override
-    public void setSuffix(String suffix) {
-        super.setSuffix(mode.getFormattedValue());
+    public String getSuffix() {
+        return super.getSuffix();
     }
 }

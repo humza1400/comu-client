@@ -1,4 +1,4 @@
-package me.comu.ducks;
+package me.comu.overrides.ducks;
 
 public interface PlayerMovePacketDuck {
     void setX(double x);

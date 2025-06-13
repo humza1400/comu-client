@@ -1,7 +1,7 @@
 package me.comu.module.impl.movement;
 
 import me.comu.api.registry.event.listener.Listener;
-import me.comu.ducks.PlayerMovePacketDuck;
+import me.comu.overrides.ducks.PlayerMovePacketDuck;
 import me.comu.events.JumpEvent;
 import me.comu.events.MotionEvent;
 import me.comu.events.MoveEvent;

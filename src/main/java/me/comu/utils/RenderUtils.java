@@ -59,7 +59,6 @@ public class RenderUtils {
         Camera camera = mc.gameRenderer.getCamera();
         Vec3d camPos = camera.getPos();
 
-        // Chroma rainbow color
         float hue = (System.currentTimeMillis() % 2000L) / 2000.0f;
         int rgb = Color.HSBtoRGB(hue, 1.0f, 1.0f);
         float r = ((rgb >> 16) & 0xFF) / 255f;
@@ -74,7 +73,7 @@ public class RenderUtils {
 
         drawBoxOutline(vertices, box, r, g, b, alpha);
 
-        immediate.draw(); // flush the buffer
+        immediate.draw();
     }
 
     public static void drawBoxOutline(VertexConsumer buffer, Box box, float r, float g, float b, float alpha) {

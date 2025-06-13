@@ -6,6 +6,7 @@ import me.comu.events.MotionEvent;
 import me.comu.events.MoveEvent;
 import me.comu.logging.Logger;
 import me.comu.module.ToggleableModule;
+import me.comu.module.impl.active.Overlay;
 import me.comu.module.impl.movement.NoSlowdown;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;

@@ -42,8 +42,8 @@ public class Overlay extends Module {
     ListProperty noRender = new ListProperty("No Render", List.of("norender", "nr"), List.of(noFire, noVanillPotionHud));
     ListProperty zoom = new ListProperty("Zoom", List.of(), List.of(zoomFactor, smoothFactor));
 
-    private float savedYaw, savedPitch;
-    private boolean wasFreelookActive = false;
+    private boolean freelookActive = false;
+    private Perspective originalPerspective;
 
     public Overlay() {
         super("Overlay", List.of(), Category.PERSISTENT, "Modify vanilla minecraft screen behavior");
@@ -52,26 +52,13 @@ public class Overlay extends Module {
             @Override
             public void call(TickEvent event) {
                 if (mc.player == null || mc.options == null) return;
+
                 boolean freelookHeld = Hook.getFreelookKeybind().isPressed();
 
-                if (freelookHeld && !wasFreelookActive) {
-                    savedYaw = mc.player.getYaw();
-                    savedPitch = mc.player.getPitch();
-                    wasFreelookActive = true;
-                }
-
-                if (!freelookHeld && wasFreelookActive) {
-                    savedYaw = mc.player.getYaw();
-                    savedPitch = mc.player.getPitch();
-                    wasFreelookActive = false;
-                }
-
-                if (freelookHeld) {
-                    if (mc.options.getPerspective() == Perspective.THIRD_PERSON_BACK || mc.options.getPerspective() == Perspective.THIRD_PERSON_FRONT) {
-                        mc.player.setYaw(savedYaw);
-                        mc.player.setPitch(savedPitch);
-                    }
-
+                if (freelookHeld && !freelookActive) {
+                    startFreelook();
+                } else if (!freelookHeld && freelookActive) {
+                    stopFreelook();
                 }
             }
         });
@@ -79,12 +66,34 @@ public class Overlay extends Module {
         Comu.getInstance().getEventManager().register(new Listener<>(Render2DEvent.class) {
             @Override
             public void call(Render2DEvent event) {
-                    if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK) {
-                        BlockHitResult hit = (BlockHitResult) mc.crosshairTarget;
-                        BlockPos pos = hit.getBlockPos();
-                        RenderUtils.drawBlockOverlay(event.getContext(), pos, event.getTickDelta());
-                    }
+                if (mc.crosshairTarget != null && mc.crosshairTarget.getType() == HitResult.Type.BLOCK) {
+                    BlockHitResult hit = (BlockHitResult) mc.crosshairTarget;
+                    BlockPos pos = hit.getBlockPos();
+                    RenderUtils.drawBlockOverlay(event.getContext(), pos, event.getTickDelta());
+                }
             }
         });
+
+
+    }
+
+    private void startFreelook() {
+        freelookActive = true;
+        originalPerspective = mc.options.getPerspective();
+
+        if (originalPerspective == Perspective.FIRST_PERSON) {
+            mc.options.setPerspective(Perspective.THIRD_PERSON_BACK);
+        }
+    }
+
+    private void stopFreelook() {
+        freelookActive = false;
+        if (originalPerspective != null) {
+            mc.options.setPerspective(originalPerspective);
+        }
+    }
+
+    public boolean isFreelookActive() {
+        return freelookActive;
     }
 }

@@ -8,6 +8,7 @@
 
 		"entity.MixinPlayerEntity",
 		"entity.MixinLivingEntity",
+		"entity.MixinEntity",
 
 		"io.MixinKeyboard",
 		"io.MixinKeyboardInput",
