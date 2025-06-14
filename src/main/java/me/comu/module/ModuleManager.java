@@ -49,6 +49,7 @@ public class ModuleManager extends Registry<Module> {
         register(new ClickGui());
         register(new TabGui());
         register(new Freecam());
+        register(new ViewClip());
 
         // World
         register(new Timer());

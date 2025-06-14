@@ -2,6 +2,7 @@ package me.comu.mixin.render;
 
 import me.comu.Comu;
 import me.comu.module.impl.active.Overlay;
+import me.comu.module.impl.render.ViewClip;
 import me.comu.overrides.EntityOverride;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
@@ -14,6 +15,7 @@ import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(Camera.class)
 public abstract class MixinCamera {
@@ -38,6 +40,14 @@ public abstract class MixinCamera {
             this.setRotation(freelook.comu$getCameraYaw(), freelook.comu$getCameraPitch());
         } else {
             firstTime = true;
+        }
+    }
+
+    @Inject(method = "clipToSpace", at = @At("HEAD"), cancellable = true)
+    private void onClipToSpace(float f, CallbackInfoReturnable<Float> cir) {
+        ViewClip viewClip = Comu.getInstance().getModuleManager().getModule(ViewClip.class);
+        if (viewClip.isEnabled()) {
+            cir.setReturnValue(f);
         }
     }
 }

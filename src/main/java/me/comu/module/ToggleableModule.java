@@ -27,7 +27,6 @@ public class ToggleableModule extends Module {
     }
 
     public void onDisable() {
-
         listeners.forEach(listener -> {
             if(listener.isAlwaysOn()) return;
             Comu.getInstance().getEventManager().unregister(listener);
