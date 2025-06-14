@@ -14,6 +14,7 @@ import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.BowItem;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
+import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
 import net.minecraft.world.tick.Tick;
 
@@ -27,6 +28,11 @@ public class Velocity extends ToggleableModule {
     private final BooleanProperty bowboost = new BooleanProperty("Bow Boost", List.of("bowboost", "bow", "boost", "bboost"), false);
     private final EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VULCAN);
     private final BooleanProperty debug = new BooleanProperty("debug", true);
+
+
+    private long firstQueuedTime = 0;
+    private final CopyOnWriteArrayList<CommonPongC2SPacket> queuedPackets = new CopyOnWriteArrayList<>();
+    private long lastVelocityTime = 0;
 
     private enum Mode {
         NCP, VULCAN,
@@ -45,9 +51,10 @@ public class Velocity extends ToggleableModule {
 
                 var p = event.getPacket();
                 if (p instanceof EntityVelocityUpdateS2CPacket packet) {
-                    switch (mode.getValue()) {
-                        case NCP -> {
-                            if (packet.getEntityId() == mc.player.getId()) {
+                    if (packet.getEntityId() == mc.player.getId()) {
+                        lastVelocityTime = System.currentTimeMillis();
+                        switch (mode.getValue()) {
+                            case NCP -> {
                                 int pct = percent.getValue();
 
                                 if (pct == 0) {
@@ -66,11 +73,51 @@ public class Velocity extends ToggleableModule {
                                     mc.player.addVelocity(newVelX, newVelY, newVelZ);
                                 }
                             }
+
+                            case VULCAN -> {
+                                double rawY = packet.getVelocityY() / 8000.0;
+                                event.setCancelled(true);
+
+                                if (rawY > 0.42) {
+                                    mc.player.addVelocity(0, rawY, 0);
+                                }
+                            }
+                        }
+                    }
+                }
+                if (event.getPacket() instanceof CommonPongC2SPacket) {
+                    if (mode.getValue() == Mode.VULCAN) {
+                        long now = System.currentTimeMillis();
+
+                        if (queuedPackets.isEmpty()) {
+                            firstQueuedTime = now;
                         }
 
-                        case VULCAN -> {
-                            
+                        if (now - lastVelocityTime < 2000) {
+                            event.setCancelled(true);
+                            queuedPackets.add((CommonPongC2SPacket) event.getPacket());
+
                         }
+                    }
+                }
+            }
+        });
+        listeners.add(new Listener<>(TickEvent.class) {
+            @Override
+            public void call(final TickEvent event) {
+                if (isPlayerOrWorldNull()) return;
+                if (mode.getValue() == Mode.VULCAN) {
+                    long now = System.currentTimeMillis();
+                    boolean twoSecPassed = now - lastVelocityTime >= 2000;
+                    boolean transactionDelayPassed = now - firstQueuedTime >= transactionDelay.getValue();
+
+                    if (!queuedPackets.isEmpty() && (twoSecPassed || transactionDelayPassed)) {
+                        if (debug.getValue())
+                            Logger.getLogger().printToChat("Flushed queue. 2: \247a" + twoSecPassed + "\2477 (" + (now - lastVelocityTime) + ")" + ", max: \247a" + transactionDelayPassed + "\2477 (" + (now - firstQueuedTime) + "), size: \247a" + queuedPackets.size());
+                        for (CommonPongC2SPacket tx : queuedPackets) {
+                            mc.getNetworkHandler().sendPacket(tx);
+                        }
+                        queuedPackets.clear();
                     }
                 }
             }

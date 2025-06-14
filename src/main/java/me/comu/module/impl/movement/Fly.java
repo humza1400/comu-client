@@ -13,11 +13,12 @@ import java.util.List;
 public class Fly extends ToggleableModule {
 
     private NumberProperty<Integer> speed = new NumberProperty<>("Speed", List.of("fs", "s"), 1, 1, 10, 1);
+    private NumberProperty<Float> ySpeed = new NumberProperty<>("ySpeed", List.of(), 0.3f, 0f, 10f, 0.1f);
     private EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VANILLA);
 
     public Fly() {
         super("Fly", List.of("flight"), Category.MOVEMENT, "I BELIEVE I CAN FLY");
-        offerProperties(speed, mode);
+        offerProperties(speed, mode, ySpeed);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
@@ -28,9 +29,9 @@ public class Fly extends ToggleableModule {
                         if (mc.player != null && mc.world != null) {
                             mc.player.getAbilities().flying = false;
                             if (!mc.options.sneakKey.isPressed())
-                                MoveUtils.setMoveSpeedFly(speed.getValue(), mc.options.jumpKey.isPressed() ? 0.3f : 0);
+                                MoveUtils.setMoveSpeedFly(speed.getValue(), mc.options.jumpKey.isPressed() ? ySpeed.getValue() : 0);
                             if (mc.options.sneakKey.isPressed())
-                                MoveUtils.setMoveSpeedFly(speed.getValue(), -0.3F);
+                                MoveUtils.setMoveSpeedFly(speed.getValue(), -ySpeed.getValue());
                         }
                         return;
                         case VANILLA:

@@ -20,13 +20,15 @@ import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
 
+import static me.comu.utils.MoveUtils.setMoveSpeed;
+
 public class Speed extends ToggleableModule {
 
     NumberProperty<Float> speed = new NumberProperty<Float>("speed", List.of(), 1f, 0f, 2f, 0.1f);
     EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VULCAN);
 
     public enum Mode {
-        VULCAN, MODZ, TEST
+        VULCAN, MODZ, TEST, BHOP
     }
 
     public Speed() {
@@ -46,6 +48,16 @@ public class Speed extends ToggleableModule {
                             }
                         }
                         break;
+
+                    case BHOP:
+                        if(MoveUtils.isMoving()) {
+                            if(mc.player.isOnGround()) {
+                                mc.player.jump();
+                            }
+                            setMoveSpeed(speed.getValue());
+                        }
+                        break;
+
                     case VULCAN:
                         EntityAttributeInstance attribute = mc.player.getAttributeInstance(EntityAttributes.MOVEMENT_SPEED);
 
