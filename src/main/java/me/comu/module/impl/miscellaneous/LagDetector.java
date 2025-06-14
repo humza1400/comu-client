@@ -47,4 +47,9 @@ public class LagDetector extends ToggleableModule {
             }
         });
     }
+
+    @Override
+    public String getSuffix() {
+        return threshold.getValue() / 1000 + "s";
+    }
 }
