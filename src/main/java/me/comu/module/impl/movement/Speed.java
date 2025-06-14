@@ -37,6 +37,7 @@ public class Speed extends ToggleableModule {
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
+                if (isPlayerOrWorldNull()) return;
                 switch (mode.getValue()) {
                     case MODZ:
                         if (MoveUtils.isMoving()) {
@@ -114,6 +115,7 @@ public class Speed extends ToggleableModule {
         listeners.add(new Listener<>(MoveEvent.class) {
             @Override
             public void call(MoveEvent event) {
+                if (isPlayerOrWorldNull()) return;
                 if (mode.getValue() == Mode.TEST && MoveUtils.isMoving()) {
                     Vec3d movement = event.getMovement();
                     Vec3d direction = movement.normalize().multiply(2);

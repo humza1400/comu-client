@@ -128,6 +128,6 @@ public class Velocity extends ToggleableModule {
 
     @Override
     public String getSuffix() {
-        return super.getSuffix();
+        return mode.getFormattedValue();
     }
 }

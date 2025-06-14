@@ -26,6 +26,7 @@ public class KillAura extends ToggleableModule {
     BooleanProperty players = new BooleanProperty("Players", List.of("player", "people"), true);
     BooleanProperty rayTrace = new BooleanProperty("Ray-Trace", List.of("raytrace", "rayt", "ray", "rt"), true);
     BooleanProperty cooldownAttack = new BooleanProperty("Cooldown", List.of("1.9pvp", "19pvp", "1.9", "19", "cd"), false);
+    BooleanProperty rangeVisualizer = new BooleanProperty("Visualize Range", List.of("vrange", "vreach", "rangev", "reachv", "visualizerange", "rangevisualize", "reachvisualize", "visualizereach", "reachvisualizer","rangevisualizer"), false);
 
     NumberProperty<Float> range = new NumberProperty<>("Reach", List.of("range", "r"), 4f, 3f, 6f, 0.1f);
     NumberProperty<Integer> aps = new NumberProperty<>("APS", List.of("speed", "cps"), 10, 1, 20, 1);
@@ -46,7 +47,7 @@ public class KillAura extends ToggleableModule {
 
     public KillAura() {
         super("Kill Aura", List.of("killaura","aura", "ka"), Category.COMBAT, "Attacks any valid targets within reach");
-        offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack, delta, smooth);
+        offerProperties(range, aps, fov, mode, mobs, passives, players, rayTrace, cooldownAttack, delta, smooth, rangeVisualizer);
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {

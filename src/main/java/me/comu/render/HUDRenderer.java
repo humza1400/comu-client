@@ -227,9 +227,12 @@ public final class HUDRenderer {
         if (hud.getFps().getValue()) yOffset = drawFPS(context, screenWidth, yOffset);
         if (hud.getPing().getValue()) yOffset = drawPing(context, screenWidth, yOffset);
         if (hud.getDirection().getValue()) drawDirection(context, screenWidth, yOffset);
-
         if (hud.getGapple().getValue()) drawGappled(context, screenWidth, screenHeight);
-        if (hud.getArmor().getValue()) drawArmor(context, screenWidth, screenHeight);
+
+        int hotbarYOffset = screenHeight + 1;
+        if (hud.getArmor().getValue()) hotbarYOffset = drawArmor(context, screenWidth, hotbarYOffset);
+        if (hud.getTPS().getValue()) hotbarYOffset = drawTPS(context, hud.getCurrentTPS(), screenWidth, hotbarYOffset);
+        if (hud.getBPS().getValue()) hotbarYOffset = drawBPS(context, hud.getCurrentBPS(), screenWidth, hotbarYOffset);
 
         Comu.getInstance().getNotificationManager().render(context);
     }
@@ -325,7 +328,45 @@ public final class HUDRenderer {
         Renderer2D.drawText(context, text, x, y, 0xFFFFFFFF, true);
     }
 
-    private static void drawArmor(DrawContext context, int screenWidth, int screenHeight) {
+    private static int drawTPS(DrawContext context, float tps, int screenWidth, int yOffset) {
+        int xOffset = screenWidth / 2 + 93;
+        yOffset -= Renderer2D.getFontHeight();
+
+        int tpsColor;
+        if (tps >= 19.4f) {
+            tpsColor = Formatting.GREEN.getColorValue();
+        } else if (tps > 19f) {
+            tpsColor = Formatting.DARK_GREEN.getColorValue();
+        } else if (tps > 17f) {
+            tpsColor = Formatting.YELLOW.getColorValue();
+        } else if (tps > 10f) {
+            tpsColor = Formatting.GOLD.getColorValue();
+        } else {
+            tpsColor = Formatting.RED.getColorValue();
+        }
+
+        String tpsString = String.format("%.2f", tps);
+        String suffix = " TPS";
+
+        int tpsWidth = Renderer2D.getStringWidth(tpsString) - 2;
+        Renderer2D.drawText(context, tpsString, xOffset, yOffset, 0xFF000000 | tpsColor, true);
+        Renderer2D.drawText(context, suffix, xOffset + tpsWidth, yOffset, 0xFFAAAAAA, true);
+
+        return yOffset - 1;
+    }
+
+
+    private static int drawBPS(DrawContext context, float bps, int screenWidth, int yOffset) {
+        int xOffset = screenWidth / 2 + 93;
+
+        String bpsStr = String.format("%.2f b/ps", bps);
+        yOffset -= Renderer2D.getFontHeight();
+        Renderer2D.drawText(context, bpsStr, xOffset, yOffset, 0x55FFFF, true);
+        return yOffset - 1;
+    }
+
+
+    private static int drawArmor(DrawContext context, int screenWidth, int yOffset) {
         MinecraftClient mc = MinecraftClient.getInstance();
         List<ItemStack> items = new ArrayList<>();
 
@@ -334,13 +375,13 @@ public final class HUDRenderer {
             if (!stack.isEmpty()) items.add(stack);
         }
 
-        if (items.isEmpty()) return;
+        if (items.isEmpty()) return yOffset;
 
+        yOffset -= 18;
         final int iconSize = 16;
         final int iconSpacing = 18;
 
         int startX = screenWidth / 2 + 93;
-        int yOffset = screenHeight - 18;
 
         for (int i = 0; i < items.size(); i++) {
             ItemStack stack = items.get(i);
@@ -367,6 +408,8 @@ public final class HUDRenderer {
                 context.getMatrices().pop();
             }
         }
+
+        return yOffset;
     }
 
     private static void updateModuleAnimation(ToggleableModule module, float speed) {

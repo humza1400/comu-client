@@ -1,9 +1,15 @@
 package me.comu.module.impl.render;
 
+import me.comu.api.registry.event.Event;
+import me.comu.api.registry.event.listener.Listener;
+import me.comu.events.PacketEvent;
+import me.comu.events.TickEvent;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
 import me.comu.property.properties.*;
+import net.minecraft.network.packet.s2c.play.WorldTimeUpdateS2CPacket;
 
+import java.text.DecimalFormat;
 import java.util.List;
 
 public class HUD extends ToggleableModule {
@@ -18,7 +24,7 @@ public class HUD extends ToggleableModule {
     private final BooleanProperty watermark = new BooleanProperty("Watermark", List.of("title"), true);
     private final BooleanProperty arrayList = new BooleanProperty("Array List", List.of("arraylist"), true);
     private final BooleanProperty armor = new BooleanProperty("Armor", List.of(), true);
-    private final BooleanProperty bps = new BooleanProperty("BPS", List.of("blockspersec","blockspersecond"), true);
+    private final BooleanProperty bps = new BooleanProperty("BPS", List.of("blockspersec", "blockspersecond"), true);
     private final BooleanProperty tps = new BooleanProperty("TPS", List.of(""), true);
 
     private final BooleanProperty suffix = new BooleanProperty("Suffix", List.of(""), true);
@@ -49,9 +55,34 @@ public class HUD extends ToggleableModule {
         DEFAULT, SLIDE, BOUNCE, FADE
     }
 
+    private float bpsValue = 0.0f;
+    private float tpsValue = 0.0f;
+    private long lastTimeUpdate = -1;
+
     public HUD() {
         super("HUD", List.of("textgui"), Category.RENDER, "Shows the client overlay and visual components");
-        offerProperties(potions, coords, clock, fps, ping, direction, gapple, watermark, arrayList, arrayListOptions);
+        offerProperties(armor, potions, coords, clock, fps, ping, direction, bps, tps, gapple, watermark, arrayList, arrayListOptions);
+        listeners.add(new Listener<>(TickEvent.class) {
+            @Override
+            public void call(TickEvent event) {
+                if (isPlayerOrWorldNull()) return;
+                final double deltaX = mc.player.getX() - mc.player.lastX;
+                final double deltaZ = mc.player.getZ() - mc.player.lastZ;
+                bpsValue = (float) Math.sqrt(deltaX * deltaX + deltaZ * deltaZ) * 20;
+            }
+        });
+
+        listeners.add(new Listener<>(PacketEvent.class) {
+            @Override
+            public void call(PacketEvent event) {
+                if (event.getPacket() instanceof WorldTimeUpdateS2CPacket) {
+                    if (lastTimeUpdate != -1) {
+                        tpsValue = Math.max(0, Math.min(20, (20.0f / ((float) (System.currentTimeMillis() - lastTimeUpdate)) / 1000f) * 1000000));
+                    }
+                    lastTimeUpdate = System.currentTimeMillis();
+                }
+            }
+        });
     }
 
     public BooleanProperty getPotions() {
@@ -116,5 +147,21 @@ public class HUD extends ToggleableModule {
 
     public EnumProperty<ArrayListTheme> getArrayListTheme() {
         return arrayListTheme;
+    }
+
+    public BooleanProperty getTPS() {
+        return tps;
+    }
+
+    public BooleanProperty getBPS() {
+        return bps;
+    }
+
+    public float getCurrentBPS() {
+        return bpsValue;
+    }
+
+    public float getCurrentTPS() {
+        return tpsValue;
     }
 }

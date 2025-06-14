@@ -5,6 +5,7 @@ import me.comu.module.impl.active.Overlay;
 import me.comu.module.impl.combat.AutoPotion;
 import me.comu.module.impl.combat.KillAura;
 import me.comu.module.impl.miscellaneous.ChatSpammer;
+import me.comu.module.impl.miscellaneous.LagDetector;
 import me.comu.module.impl.miscellaneous.MiddleClickPerson;
 import me.comu.module.impl.player.InventoryCleaner;
 import me.comu.module.impl.player.PingSpoof;
@@ -36,6 +37,7 @@ public class ModuleManager extends Registry<Module> {
         // Miscellaneous
         register(new ChatSpammer());
         register(new MiddleClickPerson());
+        register(new LagDetector());
 
         // Movement
         register(new Sprint());
