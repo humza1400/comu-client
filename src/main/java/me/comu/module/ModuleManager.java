@@ -7,6 +7,7 @@ import me.comu.module.impl.combat.KillAura;
 import me.comu.module.impl.miscellaneous.ChatSpammer;
 import me.comu.module.impl.miscellaneous.MiddleClickPerson;
 import me.comu.module.impl.player.InventoryCleaner;
+import me.comu.module.impl.player.PingSpoof;
 import me.comu.module.impl.player.Respawn;
 import me.comu.module.impl.movement.*;
 import me.comu.module.impl.render.*;
@@ -27,12 +28,13 @@ public class ModuleManager extends Registry<Module> {
         register(new KillAura());
         register(new AutoPotion());
 
-        // Exploits
+        // Player
+        register(new InventoryCleaner());
+        register(new Respawn());
+        register(new PingSpoof());
 
         // Miscellaneous
         register(new ChatSpammer());
-        register(new Respawn());
-        register(new InventoryCleaner());
         register(new MiddleClickPerson());
 
         // Movement

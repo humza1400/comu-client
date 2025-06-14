@@ -11,12 +11,9 @@ import me.comu.property.properties.EnumProperty;
 import me.comu.property.properties.NumberProperty;
 import me.comu.utils.ItemUtils;
 import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.BowItem;
-import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.common.CommonPongC2SPacket;
 import net.minecraft.network.packet.s2c.play.EntityVelocityUpdateS2CPacket;
-import net.minecraft.world.tick.Tick;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;

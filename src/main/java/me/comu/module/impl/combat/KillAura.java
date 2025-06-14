@@ -102,8 +102,10 @@ public class KillAura extends ToggleableModule {
                             mc.interactionManager.attackEntity(mc.player, target);
                         }
                     } else {
-                        int rand = (int) getRandomInRange(-3, 3);
-                        if (stopwatch.hasCompleted((long) (1000 / clamp((float) (aps.getValue() + rand), 1, 20)), true)) {
+                        int baseDelay = 1000 / aps.getValue();
+                        int jitter = ThreadLocalRandom.current().nextInt(-75, 75);
+                        int targetDelay = Math.max(60, baseDelay + jitter);
+                        if (stopwatch.hasCompleted(targetDelay, true)) {
                             mc.player.swingHand(mc.player.getActiveHand());
                             mc.player.attack(target);
                             mc.interactionManager.attackEntity(mc.player, target);

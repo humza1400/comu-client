@@ -13,6 +13,7 @@ import me.comu.people.friend.FriendManager;
 import me.comu.people.staff.StaffManager;
 import me.comu.render.HUDRenderer;
 import me.comu.rotation.RotationManager;
+import me.comu.skidcodedelete.MicrosoftLogin;
 import net.fabricmc.api.ClientModInitializer;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
@@ -60,7 +61,7 @@ public class Comu implements ClientModInitializer {
         this.configManager.loadAll();
 
         // This will be removed soon for our own login api since it's a shitty library.
-//        MicrosoftLogin.setUserMicrosoft("", "");
+        MicrosoftLogin.setUserMicrosoft("", "");
         Hook.init();
         HUDRenderer.init();
         LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
