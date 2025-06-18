@@ -1,14 +1,15 @@
 package me.comu.utils;
 
-import me.comu.logging.Logger;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.component.DataComponentTypes;
+import net.minecraft.component.type.AttributeModifiersComponent;
 import net.minecraft.component.type.ItemEnchantmentsComponent;
 import net.minecraft.component.type.PotionContentsComponent;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
 import net.minecraft.entity.EquipmentSlot;
+import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.AxeItem;
 import net.minecraft.item.Item;
@@ -18,6 +19,7 @@ import net.minecraft.potion.Potion;
 import net.minecraft.potion.Potions;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.entry.RegistryEntry;
+import net.minecraft.registry.tag.ItemTags;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -221,4 +223,62 @@ public class ItemUtils {
         Potion potion = potionEntry.value();
         return potion.getBaseName().equalsIgnoreCase(Potions.HEALING.getIdAsString().replaceFirst("minecraft:", "")) || potion.getBaseName().equalsIgnoreCase(Potions.STRONG_HEALING.getIdAsString().replaceFirst("minecraft:", ""));
     }
+
+    public static boolean isArmor(ItemStack itemStack) {
+        return itemStack.isIn(ItemTags.FOOT_ARMOR) || itemStack.isIn(ItemTags.LEG_ARMOR) || itemStack.isIn(ItemTags.CHEST_ARMOR) || itemStack.isIn(ItemTags.HEAD_ARMOR);
+    }
+
+    public static int getArmorSlotForItem(Item item) {
+        if (item.getDefaultStack().isIn(ItemTags.FOOT_ARMOR)) return 0;
+        if (item.getDefaultStack().isIn(ItemTags.LEG_ARMOR)) return 1;
+        if (item.getDefaultStack().isIn(ItemTags.CHEST_ARMOR)) return 2;
+        if (item.getDefaultStack().isIn(ItemTags.HEAD_ARMOR)) return 3;
+        return -1;
+    }
+
+    public static EquipmentSlot getEquipmentSlot(int armorSlot) {
+        return switch (armorSlot) {
+            case 0 -> EquipmentSlot.FEET;
+            case 1 -> EquipmentSlot.LEGS;
+            case 2 -> EquipmentSlot.CHEST;
+            case 3 -> EquipmentSlot.HEAD;
+            default -> throw new IllegalArgumentException("Invalid armor slot: " + armorSlot);
+        };
+    }
+
+
+    public static int getArmorScore(ItemStack stack, int armorSlot) {
+        if (stack == null || stack.isEmpty() || !ItemUtils.isArmor(stack)) return 0;
+        if (ItemUtils.getArmorSlotForItem(stack.getItem()) != armorSlot) return 0;
+
+        int score = 0;
+
+        score += 3 * ItemUtils.getEnchantmentLevel(Enchantments.PROTECTION, stack);
+        score += 2 * ItemUtils.getEnchantmentLevel(Enchantments.UNBREAKING, stack);
+        score += 2 * ItemUtils.getEnchantmentLevel(Enchantments.MENDING, stack);
+        score += ItemUtils.getEnchantmentLevel(Enchantments.THORNS, stack);
+        score += ItemUtils.getEnchantmentLevel(Enchantments.FIRE_PROTECTION, stack);
+        score += ItemUtils.getEnchantmentLevel(Enchantments.BLAST_PROTECTION, stack);
+        score += ItemUtils.getEnchantmentLevel(Enchantments.PROJECTILE_PROTECTION, stack);
+
+        if (stack.contains(DataComponentTypes.ATTRIBUTE_MODIFIERS)) {
+            AttributeModifiersComponent modifiers = stack.get(DataComponentTypes.ATTRIBUTE_MODIFIERS);
+            if (modifiers != null) {
+                for (AttributeModifiersComponent.Entry entry : modifiers.modifiers()) {
+                    if (entry.attribute() == EntityAttributes.ARMOR || entry.attribute() == EntityAttributes.ARMOR_TOUGHNESS) {
+                        double value = entry.modifier().value();
+                        score += switch (entry.modifier().operation()) {
+                            case ADD_VALUE -> (int) value;
+                            case ADD_MULTIPLIED_BASE ->
+                                    (int) (value * MinecraftClient.getInstance().player.getAttributeBaseValue(entry.attribute()));
+                            case ADD_MULTIPLIED_TOTAL -> (int) (value * score);
+                        };
+                    }
+                }
+            }
+        }
+
+        return score;
+    }
+
 }

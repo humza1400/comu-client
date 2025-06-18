@@ -4,9 +4,9 @@ import me.comu.api.registry.event.Event;
 import net.minecraft.client.util.math.MatrixStack;
 
 public class Render3DEvent extends Event {
-    public final MatrixStack matrixStack;
-    public final float tickDelta;
-    public final double cameraX, cameraY, cameraZ;
+    private final MatrixStack matrixStack;
+    private final float tickDelta;
+    private final double cameraX, cameraY, cameraZ;
 
     public Render3DEvent(MatrixStack matrixStack, float tickDelta, double cameraX, double cameraY, double cameraZ) {
         this.matrixStack = matrixStack;

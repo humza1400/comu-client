@@ -5,10 +5,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
-import net.minecraft.client.render.Camera;
-import net.minecraft.client.render.RenderLayer;
-import net.minecraft.client.render.VertexConsumer;
-import net.minecraft.client.render.VertexConsumerProvider;
+import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
@@ -17,6 +14,7 @@ import net.minecraft.util.math.Box;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
 import org.joml.Matrix4f;
+import org.joml.Vector4f;
 
 import java.awt.*;
 
@@ -102,6 +100,41 @@ public class RenderUtils {
         buffer.vertex((float) x2, (float) y2, (float) z2).color(r, g, b, a).normal(0, 1, 0);
     }
 
+    public static void drawLine(DrawContext context, float x1, float y1, float x2, float y2, int color) {
+        MatrixStack matrices = context.getMatrices();
+        Matrix4f matrix = matrices.peek().getPositionMatrix();
+
+        MinecraftClient mc = MinecraftClient.getInstance();
+        var provider = mc.getBufferBuilders().getEntityVertexConsumers(); // ImmediateVertexConsumerProvider
+        var buffer = provider.getBuffer(RenderLayer.getLines());
+
+        float r = (color >> 16 & 255) / 255.0f;
+        float g = (color >> 8 & 255) / 255.0f;
+        float b = (color & 255) / 255.0f;
+        float a = (color >> 24 & 255) / 255.0f;
+
+        buffer.vertex(matrix, x1, y1, 0).color(r, g, b, a).normal(0, 0, -1);
+        buffer.vertex(matrix, x2, y2, 0).color(r, g, b, a).normal(0, 0, -1);
+
+        provider.draw();
+    }
+
+    public static void drawCircle3D(VertexConsumer buffer, double cx, double cy, double cz, float radius, float r, float g, float b, float a, int segments) {
+        double prevX = cx + radius;
+        double prevZ = cz;
+
+        for (int i = 1; i <= segments; i++) {
+            double angle = 2.0 * Math.PI * i / segments;
+            double x = cx + Math.cos(angle) * radius;
+            double z = cz + Math.sin(angle) * radius;
+
+            drawLine(buffer, prevX, cy, prevZ, x, cy, z, r, g, b, a);
+
+            prevX = x;
+            prevZ = z;
+        }
+    }
+
     public static void drawGradientRect(DrawContext context, int x, int y, int width, int height, int topColor, int bottomColor) {
         for (int i = 0; i < height; i++) {
             float ratio = (float) i / height;
@@ -141,4 +174,33 @@ public class RenderUtils {
             context.drawText(textRenderer, textString, x - textRenderer.getWidth(textString) / 2, y, glowColor, false);
         }
     }
+
+    public static Vec3d worldToScreen(Vec3d pos) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        Camera camera = mc.gameRenderer.getCamera();
+
+        Matrix4f projectionMatrix = new Matrix4f(RenderSystem.getProjectionMatrix());
+        Matrix4f modelViewMatrix = new Matrix4f(RenderSystem.getModelViewMatrix());
+
+        Vec3d camPos = camera.getPos();
+        Vec3d relative = pos.subtract(camPos);
+
+        Vector4f vec = new Vector4f((float) relative.x, (float) relative.y, (float) relative.z, 1.0f);
+        vec.mul(modelViewMatrix);
+        vec.mul(projectionMatrix);
+
+        if (vec.w <= 0.0f) return null;
+
+        vec.div(vec.w);
+
+        int screenWidth = mc.getWindow().getFramebufferWidth();
+        int screenHeight = mc.getWindow().getFramebufferHeight();
+
+        float screenX = (vec.x * 0.5f + 0.5f) * screenWidth;
+        float screenY = (1.0f - (vec.y * 0.5f + 0.5f)) * screenHeight;
+
+        return new Vec3d(screenX, screenY, 0);
+    }
+
+
 }
