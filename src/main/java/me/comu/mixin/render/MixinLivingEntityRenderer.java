@@ -26,8 +26,6 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
                 state.bodyYaw = rotationManager.getYaw();
                 state.relativeHeadYaw = rotationManager.getYaw() - state.bodyYaw;
                 state.pitch = rotationManager.getPitch();
-
-                rotationManager.reset();
             }
         }
     }

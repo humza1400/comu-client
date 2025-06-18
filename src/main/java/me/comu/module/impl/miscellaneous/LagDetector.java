@@ -42,7 +42,7 @@ public class LagDetector extends ToggleableModule {
 
                 if (!lagging && stopwatch.hasCompleted(threshold.getValue())) {
                     lagging = true;
-                    Comu.getInstance().getNotificationManager().notify(new Notification(NotificationType.WARNING, "Lag Detector", "No packets received for " + (threshold.getValue() / 1000.0) + "s!", 3));
+                    Comu.getInstance().getNotificationManager().notify(new Notification(NotificationType.WARNING, "Lag Detector", "No packets received for " + (threshold.getValue() / 1000.0) + "s!"));
                 }
             }
         });

@@ -41,7 +41,6 @@ public class InventoryCleaner extends ToggleableModule {
                         case EVERYTHING -> true;
                         case POTION -> stack.getItem() instanceof PotionItem;
                         case PURPLE -> {
-                            Item item = stack.getItem();
                             boolean keepWeapon = ItemUtils.isOmega(stack) || ItemUtils.isPurpleGodSword(stack);
                             boolean keepBow = ItemUtils.isPunch2OrBetter(stack);
                             boolean keepGapple = ItemUtils.isGapple(stack);
