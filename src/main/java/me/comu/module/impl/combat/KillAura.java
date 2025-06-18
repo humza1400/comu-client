@@ -13,7 +13,6 @@ import me.comu.property.properties.NumberProperty;
 import me.comu.utils.RotationUtils;
 import net.minecraft.entity.Entity;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.ThreadLocalRandom;

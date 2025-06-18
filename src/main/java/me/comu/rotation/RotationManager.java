@@ -1,12 +1,12 @@
 package me.comu.rotation;
 
-import me.comu.module.ToggleableModule;
 import net.minecraft.client.MinecraftClient;
 
-public class RotationManager {
-
+public final class RotationManager {
     public enum Priority {
-        LOW(0), NORMAL(1), HIGH(2);
+        LOW(0),
+        MEDIUM(1),
+        HIGH(2);
 
         private final int level;
 
@@ -19,67 +19,51 @@ public class RotationManager {
         }
     }
 
-    private float serverYaw, serverPitch;
-    private float cameraYaw, cameraPitch;
+    private float yaw, pitch;
     private boolean isRotating;
     private Priority currentPriority = Priority.LOW;
-    private ToggleableModule provider;
+    private Class<?> source;
 
-    private final MinecraftClient mc = MinecraftClient.getInstance();
-
-    public void setRotation(float yaw, float pitch, Priority priority, ToggleableModule source) {
-        if (priority.getLevel() >= currentPriority.getLevel() || provider == source) {
-            this.serverYaw = yaw;
-            this.serverPitch = pitch;
-            this.currentPriority = priority;
-            this.provider = source;
+    public void setRotations(float yaw, float pitch, Priority priority, Class<?> source) {
+        if (!isRotating || priority.getLevel() >= currentPriority.getLevel()) {
+            this.yaw = yaw;
+            this.pitch = pitch;
             this.isRotating = true;
+            this.currentPriority = priority;
+            this.source = source;
         }
     }
 
-    public void setCameraRotation(float yaw, float pitch) {
-        this.cameraYaw = yaw;
-        this.cameraPitch = pitch;
-    }
-
-    public void syncCameraToPlayer() {
-        if (mc.player != null) {
-            this.cameraYaw = mc.player.getYaw();
-            this.cameraPitch = mc.player.getPitch();
-        }
-    }
-
-    public float getServerYaw() {
-        return serverYaw;
-    }
-
-    public float getServerPitch() {
-        return serverPitch;
-    }
-
-    public float getCameraYaw() {
-        return cameraYaw;
-    }
-
-    public float getCameraPitch() {
-        return cameraPitch;
+    public void reset() {
+        this.isRotating = false;
+        this.currentPriority = Priority.LOW;
     }
 
     public boolean isRotating() {
         return isRotating;
     }
 
-    public Priority getPriority() {
+    public float getRenderYaw() {
+        return isRotating ? yaw : MinecraftClient.getInstance().player.getYaw();
+    }
+
+    public float getRenderPitch() {
+        return isRotating ? pitch : MinecraftClient.getInstance().player.getPitch();
+    }
+
+    public float getYaw() {
+        return yaw;
+    }
+
+    public float getPitch() {
+        return pitch;
+    }
+
+    public Priority getCurrentPriority() {
         return currentPriority;
     }
 
-    public ToggleableModule getProvider() {
-        return provider;
-    }
-
-    public void reset() {
-        this.isRotating = false;
-        this.currentPriority = Priority.LOW;
-        this.provider = null;
+    public Class<?> getSource() {
+        return source;
     }
 }

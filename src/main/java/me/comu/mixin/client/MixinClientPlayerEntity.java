@@ -4,13 +4,10 @@ import com.llamalad7.mixinextras.injector.ModifyExpressionValue;
 import me.comu.Comu;
 import me.comu.events.MotionEvent;
 import me.comu.events.MoveEvent;
-import me.comu.logging.Logger;
-import me.comu.module.ToggleableModule;
-import me.comu.module.impl.active.Overlay;
 import me.comu.module.impl.movement.NoSlowdown;
+import me.comu.rotation.RotationManager;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.option.Perspective;
 import net.minecraft.entity.Entity;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.util.math.MathHelper;
@@ -51,12 +48,7 @@ public abstract class MixinClientPlayerEntity {
         if (motionEvent.isCancelled())
             return;
 
-        // TODO: Move to render event
-        if (mc.options.getPerspective() == Perspective.THIRD_PERSON_FRONT || mc.options.getPerspective() == Perspective.THIRD_PERSON_BACK) {
-            mc.player.headYaw = motionEvent.getYaw();
-            mc.player.bodyYaw = motionEvent.getYaw();
-            mc.player.setPitch(motionEvent.getPitch());
-        }
+        Comu.getInstance().getRotationManager().setRotations(motionEvent.getYaw(), motionEvent.getPitch(), RotationManager.Priority.HIGH, MotionEvent.class);
 
         if (this.isCamera()) {
             this.sendSprintingPacket();

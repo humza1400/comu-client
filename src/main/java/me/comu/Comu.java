@@ -61,7 +61,7 @@ public class Comu implements ClientModInitializer {
         this.configManager.loadAll();
 
         // This will be removed soon for our own login api since it's a shitty library.
-        MicrosoftLogin.setUserMicrosoft("", "");
+//        MicrosoftLogin.setUserMicrosoft("", "");
         Hook.init();
         HUDRenderer.init();
         LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
