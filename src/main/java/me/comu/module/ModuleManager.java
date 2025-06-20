@@ -32,12 +32,12 @@ public class ModuleManager extends Registry<Module> {
         register(new AutoArmor());
 
         // Player
-        register(new InventoryCleaner());
-        register(new Respawn());
         register(new PingSpoof());
 
         // Miscellaneous
         register(new ChatSpammer());
+        register(new Respawn());
+        register(new InventoryCleaner());
         register(new MiddleClickPerson());
         register(new LagDetector());
 
@@ -48,6 +48,7 @@ public class ModuleManager extends Registry<Module> {
         register(new Velocity());
         register(new NoSlowdown());
         register(new InventoryMove());
+        register(new NoFall());
 
         // Render
         register(new HUD());

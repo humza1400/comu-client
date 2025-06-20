@@ -13,7 +13,7 @@ import java.util.List;
 public class Fly extends ToggleableModule {
 
     private NumberProperty<Integer> speed = new NumberProperty<>("Speed", List.of("fs", "s"), 1, 1, 10, 1);
-    private NumberProperty<Float> ySpeed = new NumberProperty<>("ySpeed", List.of(), 0.3f, 0f, 10f, 0.1f);
+    private NumberProperty<Float> ySpeed = new NumberProperty<>("Y-Speed", List.of("y", "ySpeed"), 0.3f, 0f, 10f, 0.1f);
     private EnumProperty<Mode> mode = new EnumProperty<>("Mode", List.of("m"), Mode.VANILLA);
 
     public Fly() {

@@ -2,6 +2,7 @@ package me.comu.module.impl.player;
 
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.events.PacketEvent;
+import me.comu.events.TickEvent;
 import me.comu.logging.Logger;
 import me.comu.module.Category;
 import me.comu.module.ToggleableModule;
@@ -34,9 +35,9 @@ public class PingSpoof extends ToggleableModule {
             }
         });
 
-        listeners.add(new Listener<>(me.comu.events.TickEvent.class) {
+        listeners.add(new Listener<>(TickEvent.class) {
             @Override
-            public void call(me.comu.events.TickEvent event) {
+            public void call(TickEvent event) {
                 long now = System.currentTimeMillis();
                 while (!packetQueue.isEmpty()) {
                     Pair<Packet<?>, Long> pair = packetQueue.peek();

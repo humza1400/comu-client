@@ -15,7 +15,14 @@ import net.minecraft.entity.attribute.EntityAttributeInstance;
 import net.minecraft.entity.attribute.EntityAttributes;
 import net.minecraft.entity.effect.StatusEffectInstance;
 import net.minecraft.entity.effect.StatusEffects;
+import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
+import net.minecraft.network.packet.c2s.play.PlayerInteractBlockC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
+import net.minecraft.potion.Potion;
+import net.minecraft.util.Hand;
+import net.minecraft.util.hit.BlockHitResult;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Direction;
 import net.minecraft.util.math.Vec3d;
 
 import java.util.List;
@@ -37,7 +44,6 @@ public class Speed extends ToggleableModule {
         listeners.add(new Listener<>(MotionEvent.class) {
             @Override
             public void call(MotionEvent event) {
-                if (isPlayerOrWorldNull()) return;
                 switch (mode.getValue()) {
                     case MODZ:
                         if (MoveUtils.isMoving()) {
@@ -115,7 +121,6 @@ public class Speed extends ToggleableModule {
         listeners.add(new Listener<>(MoveEvent.class) {
             @Override
             public void call(MoveEvent event) {
-                if (isPlayerOrWorldNull()) return;
                 if (mode.getValue() == Mode.TEST && MoveUtils.isMoving()) {
                     Vec3d movement = event.getMovement();
                     Vec3d direction = movement.normalize().multiply(2);

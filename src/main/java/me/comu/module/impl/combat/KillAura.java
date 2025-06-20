@@ -1,5 +1,6 @@
 package me.comu.module.impl.combat;
 
+import me.comu.Comu;
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.api.stopwatch.Stopwatch;
 import me.comu.events.MotionEvent;
@@ -40,8 +41,6 @@ public class KillAura extends ToggleableModule {
     private final Stopwatch stopwatch = new Stopwatch();
     private Entity target = null;
     private Entity lastTarget = null;
-    public static float clientRotationYaw, clientRotationPitch;
-    private boolean shouldReturnToClientRotation = false;
     private float currentYaw, currentPitch;
 
     public KillAura() {
@@ -65,7 +64,6 @@ public class KillAura extends ToggleableModule {
                         event.setPitch(currentPitch);
                         return;
                     }
-
                     float baseYaw = currentYaw;
                     float basePitch = currentPitch;
 
@@ -81,7 +79,9 @@ public class KillAura extends ToggleableModule {
                     currentPitch = normalized[1];
 
                     event.setYaw(currentYaw);
-                    event.setPitch(currentPitch);
+                    AutoPotion autoPotion = Comu.getInstance().getModuleManager().getModule(AutoPotion.class);
+                    if(autoPotion.isEnabled() && (!autoPotion.doPot || !autoPotion.pendingSwitch)) event.setPitch(currentPitch);
+                    if(!autoPotion.isEnabled()) event.setPitch(currentPitch);
                     Logger.getLogger().print("Yaw " + currentYaw + " Pitch " + currentPitch);
                 }
             }
@@ -90,9 +90,12 @@ public class KillAura extends ToggleableModule {
         listeners.add(new Listener<>(TickEvent.class) {
             @Override
             public void call(TickEvent event) {
+                AutoPotion autoPotion = Comu.getInstance().getModuleManager().getModule(AutoPotion.class);
+                if(autoPotion != null && (autoPotion.doPot || autoPotion.pendingSwitch)) return;
                 if (mc.player == null || target == null || mc.interactionManager == null) {
                     return;
                 }
+
                 if (event.getPhase() == TickEvent.Phase.PRE) {
                     if (cooldownAttack.getValue()) {
                         float cooldown = mc.player.getAttackCooldownProgress(0);
@@ -114,35 +117,6 @@ public class KillAura extends ToggleableModule {
                 }
             }
         });
-
-        listeners.add(new Listener<>(MotionEvent.class, true) {
-            @Override
-            public void call(MotionEvent event) {
-                clientRotationYaw = mc.player.getYaw();
-                clientRotationPitch = mc.player.getPitch();
-
-                if (shouldReturnToClientRotation) {
-                    float wrappedYaw = wrapYawToBase(mc.player.getYaw(), currentYaw);
-                    float wrappedPitch = clamp(mc.player.getPitch(), -90f, 90f);
-                    float[] normalized = normalizeRotation(wrappedYaw, wrappedPitch, currentYaw, currentPitch, delta.getValue());
-
-
-                    currentYaw = normalized[0];
-                    currentPitch = normalized[1];
-
-                    event.setYaw(currentYaw);
-                    event.setPitch(currentPitch);
-
-                    float yawDiff = Math.abs(currentYaw - mc.player.getYaw());
-                    float pitchDiff = Math.abs(currentPitch - mc.player.getPitch());
-
-                    if (yawDiff < 0.1f && pitchDiff < 0.1f) {
-                        shouldReturnToClientRotation = false;
-                    }
-
-                }
-            }
-        });
     }
 
     @Override
@@ -150,7 +124,6 @@ public class KillAura extends ToggleableModule {
         super.onDisable();
         if(isPlayerOrWorldNull()) return;
         target = null;
-        shouldReturnToClientRotation = true;
     }
 
     public void onEnable() {

@@ -26,7 +26,7 @@ public class MoveUtils {
         float yaw = player.getYaw();
 
         if (forward == 0.0F && strafe == 0.0F) {
-            player.setVelocity(Vec3d.ZERO);
+            player.setVelocity(new Vec3d(0, motionY, 0));
         } else {
             if (forward != 0.0F) {
                 if (strafe > 0.0F) {
