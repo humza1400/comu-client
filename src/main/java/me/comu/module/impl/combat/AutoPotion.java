@@ -1,6 +1,5 @@
 package me.comu.module.impl.combat;
 
-import me.comu.api.registry.event.Event;
 import me.comu.api.registry.event.listener.Listener;
 import me.comu.api.stopwatch.Stopwatch;
 import me.comu.events.MotionEvent;
@@ -10,21 +9,15 @@ import me.comu.module.ToggleableModule;
 import me.comu.property.properties.BooleanProperty;
 import me.comu.property.properties.NumberProperty;
 import me.comu.utils.ItemUtils;
-import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.network.packet.c2s.play.PlayerActionC2SPacket;
 import net.minecraft.network.packet.c2s.play.PlayerInteractItemC2SPacket;
 import net.minecraft.network.packet.c2s.play.UpdateSelectedSlotC2SPacket;
-import net.minecraft.potion.Potion;
-import net.minecraft.potion.Potions;
-import net.minecraft.registry.Registries;
 import net.minecraft.screen.slot.SlotActionType;
 import net.minecraft.util.Hand;
-import net.minecraft.util.Identifier;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Direction;
-import net.minecraft.world.tick.Tick;
 
 import java.util.List;
 import java.util.Random;
@@ -50,7 +43,7 @@ public class AutoPotion extends ToggleableModule {
     private float currentPitch;
 
     public AutoPotion() {
-        super("Auto Potion", List.of("autopot", "autopotion"), Category.COMBAT, "Pots for you when at low health");
+        super("Auto Potion", List.of("autopot", "autopotion", "ap", "ap2", "autoheal"), Category.COMBAT, "Pots for you when at low health");
         offerProperties(health, delay, defensive, eatCheck, ladderCheck);
         this.listeners.add(new Listener<>(MotionEvent.class) {
             @Override
@@ -58,7 +51,7 @@ public class AutoPotion extends ToggleableModule {
                 if (isPlayerOrWorldNull()) return;
                 setSuffix(Integer.toString(ItemUtils.getPotCount()));
                 if (event.isPre()) {
-                    if (pendingSwitch){
+                    if (pendingSwitch) {
                         event.setPitch(90);
                     }
                     final ItemThing potSlot = getHealingItemFromInventory();
@@ -178,7 +171,7 @@ public class AutoPotion extends ToggleableModule {
         pendingIsSoup = false;
         pendingPotSlot = -1;
         pendingOriginalSlot = -1;
-        currentPitch = mc.player.getPitch();
+        if (!isPlayerOrWorldNull()) currentPitch = mc.player.getPitch();
     }
 
     @Override

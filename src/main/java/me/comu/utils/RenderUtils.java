@@ -7,6 +7,7 @@ import net.minecraft.client.font.TextRenderer;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.render.*;
 import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.Entity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.BlockPos;
@@ -21,14 +22,16 @@ import java.awt.*;
 public class RenderUtils {
 
     private static MinecraftClient mc = MinecraftClient.getInstance();
-
+    public static boolean isRendering3D = true;
 
     public static void unscaledProjection() {
         RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, mc.getWindow().getFramebufferWidth(), mc.getWindow().getFramebufferHeight(), 0, 1000, 21000), ProjectionType.ORTHOGRAPHIC);
+        isRendering3D = false;
     }
 
     public static void scaledProjection() {
         RenderSystem.setProjectionMatrix(new Matrix4f().setOrtho(0, (float) (mc.getWindow().getFramebufferWidth() / mc.getWindow().getScaleFactor()), (float) (mc.getWindow().getFramebufferHeight() / mc.getWindow().getScaleFactor()), 0, 1000, 21000), ProjectionType.PERSPECTIVE);
+        isRendering3D = true;
     }
 
     public static void drawItem(DrawContext drawContext, ItemStack itemStack, int x, int y, float scale, boolean overlay, String countOverride) {
@@ -57,6 +60,32 @@ public class RenderUtils {
         context.fillGradient(x2 - 1, y1, x2, y2, startColor, endColor);
     }
 
+    public static void drawEntityBox(Entity entity, int color) {
+        Box box = entity.getBoundingBox().offset(-entity.getX(), -entity.getY(), -entity.getZ());
+        drawBox(box.offset(entity.getX(), entity.getY(), entity.getZ()), color);
+    }
+
+    public static void drawBox(Box box, int color) {
+        MinecraftClient mc = MinecraftClient.getInstance();
+        Vec3d camPos = mc.gameRenderer.getCamera().getPos();
+
+        Box viewBox = box.offset(-camPos.x, -camPos.y, -camPos.z);
+
+        float r = (color >> 16 & 255) / 255.0f;
+        float g = (color >> 8 & 255) / 255.0f;
+        float b = (color & 255) / 255.0f;
+        float a = (color >> 24 & 255) / 255.0f;
+
+        VertexConsumerProvider.Immediate immediate = mc.getBufferBuilders().getEntityVertexConsumers();
+        VertexConsumer buffer = immediate.getBuffer(RenderLayer.getLines());
+
+        drawBoxOutline(buffer, viewBox, r, g, b, a);
+
+        immediate.draw();
+    }
+
+
+
     public static void drawBlockOverlay(DrawContext context, BlockPos blockPos, float tickDelta) {
         MinecraftClient mc = MinecraftClient.getInstance();
         Camera camera = mc.gameRenderer.getCamera();
@@ -80,20 +109,28 @@ public class RenderUtils {
     }
 
     public static void drawBoxOutline(VertexConsumer buffer, Box box, float r, float g, float b, float alpha) {
-        drawLine(buffer, box.minX, box.minY, box.minZ, box.maxX, box.minY, box.minZ, r, g, b, alpha);
-        drawLine(buffer, box.minX, box.minY, box.minZ, box.minX, box.maxY, box.minZ, r, g, b, alpha);
-        drawLine(buffer, box.minX, box.minY, box.minZ, box.minX, box.minY, box.maxZ, r, g, b, alpha);
-        drawLine(buffer, box.maxX, box.maxY, box.maxZ, box.minX, box.maxY, box.maxZ, r, g, b, alpha);
-        drawLine(buffer, box.maxX, box.maxY, box.maxZ, box.maxX, box.minY, box.maxZ, r, g, b, alpha);
-        drawLine(buffer, box.maxX, box.maxY, box.maxZ, box.maxX, box.maxY, box.minZ, r, g, b, alpha);
+        double x1 = box.minX, y1 = box.minY, z1 = box.minZ;
+        double x2 = box.maxX, y2 = box.maxY, z2 = box.maxZ;
 
-        drawLine(buffer, box.maxX, box.minY, box.minZ, box.maxX, box.maxY, box.minZ, r, g, b, alpha);
-        drawLine(buffer, box.maxX, box.minY, box.minZ, box.maxX, box.minY, box.maxZ, r, g, b, alpha);
-        drawLine(buffer, box.minX, box.maxY, box.maxZ, box.minX, box.minY, box.maxZ, r, g, b, alpha);
-        drawLine(buffer, box.minX, box.maxY, box.maxZ, box.minX, box.maxY, box.minZ, r, g, b, alpha);
-        drawLine(buffer, box.minX, box.minY, box.maxZ, box.maxX, box.minY, box.maxZ, r, g, b, alpha);
-        drawLine(buffer, box.minX, box.maxY, box.minZ, box.maxX, box.maxY, box.minZ, r, g, b, alpha);
+        // Bottom square
+        drawLine(buffer, x1, y1, z1, x2, y1, z1, r, g, b, alpha);
+        drawLine(buffer, x2, y1, z1, x2, y1, z2, r, g, b, alpha);
+        drawLine(buffer, x2, y1, z2, x1, y1, z2, r, g, b, alpha);
+        drawLine(buffer, x1, y1, z2, x1, y1, z1, r, g, b, alpha);
+
+        // Top square
+        drawLine(buffer, x1, y2, z1, x2, y2, z1, r, g, b, alpha);
+        drawLine(buffer, x2, y2, z1, x2, y2, z2, r, g, b, alpha);
+        drawLine(buffer, x2, y2, z2, x1, y2, z2, r, g, b, alpha);
+        drawLine(buffer, x1, y2, z2, x1, y2, z1, r, g, b, alpha);
+
+        // Vertical edges
+        drawLine(buffer, x1, y1, z1, x1, y2, z1, r, g, b, alpha);
+        drawLine(buffer, x2, y1, z1, x2, y2, z1, r, g, b, alpha);
+        drawLine(buffer, x2, y1, z2, x2, y2, z2, r, g, b, alpha);
+        drawLine(buffer, x1, y1, z2, x1, y2, z2, r, g, b, alpha);
     }
+
 
     public static void drawLine(VertexConsumer buffer, double x1, double y1, double z1, double x2, double y2, double z2, float r, float g, float b, float a) {
         buffer.vertex((float) x1, (float) y1, (float) z1).color(r, g, b, a).normal(0, 1, 0);

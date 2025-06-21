@@ -2,8 +2,9 @@ package me.comu.command;
 
 import me.comu.Comu;
 import me.comu.api.registry.Registry;
-import me.comu.command.commands.client.*;
 import me.comu.command.commands.client.Module;
+import me.comu.command.commands.client.*;
+import me.comu.command.commands.player.*;
 import me.comu.logging.Logger;
 
 import java.util.ArrayList;
@@ -33,6 +34,7 @@ public class CommandManager extends Registry<Command> {
         // Network
 
         // Player
+        register(new VClip());
 
         // Server
     }

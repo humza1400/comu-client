@@ -32,6 +32,7 @@ public class Nametags extends ToggleableModule {
     BooleanProperty hunger = new BooleanProperty("Hunger", List.of("food"), false);
     BooleanProperty heart = new BooleanProperty("Heart", List.of("hearts"), true);
     BooleanProperty equipment = new BooleanProperty("Equipment", List.of("armor", "a"), true);
+    BooleanProperty enchants = new BooleanProperty("Enchantments", List.of("enchants", "e", "ench"), true);
     BooleanProperty self = new BooleanProperty("Self", List.of("s"), false);
     BooleanProperty potions = new BooleanProperty("Potions", List.of("potion", "pot", "p"), false);
     BooleanProperty distance = new BooleanProperty("Distance", List.of("blocks", "d", "dist"), false);
@@ -48,7 +49,7 @@ public class Nametags extends ToggleableModule {
 
     public Nametags() {
         super("Nametags", List.of("tags", "nt", "nameplates"), Category.RENDER, "Renders nametags on players");
-        offerProperties(health, equipment, self, potions, distance, lores, invisibles, ping, healthLook, heart, hunger, durability);
+        offerProperties(health, equipment, enchants, self, potions, distance, lores, invisibles, ping, healthLook, heart, hunger, durability);
         listeners.add(new Listener<>(Render2DEvent.class) {
             @Override
             public void call(Render2DEvent event) {
@@ -170,7 +171,9 @@ public class Nametags extends ToggleableModule {
                 context.getMatrices().pop();
             }
             List<String> enchants = ItemUtils.getShortenedEnchantments(stack);
-            if (!enchants.isEmpty()) {
+
+            boolean isMainHand = stack == player.getMainHandStack();
+            if (!enchants.isEmpty() && (this.enchants.getValue() || isMainHand)) {
                 context.getMatrices().push();
 
                 float scaleFactor = 0.45f;
@@ -189,7 +192,7 @@ public class Nametags extends ToggleableModule {
     }
 
     private Text getDisplayName(PlayerEntity player) {
-        String nameStr = player.getName().getString();
+        String nameStr = player.getDisplayName() == null ? player.getName().getString() : player.getDisplayName().getString();
         MutableText name;
 
         TextColor color = TextColor.parse("#AAAAAA").result().orElse(TextColor.fromRgb(0xAAAAAA));

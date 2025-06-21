@@ -19,8 +19,10 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.Formatting;
 
 import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 
@@ -527,7 +529,7 @@ public final class HUDRenderer {
 
         switch (category) {
             case COMBAT -> baseColor = 0xFFFA5551;
-            case PLAYER -> baseColor = 0x5CCEFF;
+            case PLAYER -> baseColor = 0xFFFAA3E3;
             case MOVEMENT -> baseColor = 0x77A7F7;
             case MISCELLANEOUS -> baseColor = 0xB4FFAC;
             case RENDER -> baseColor = 0xFFFFFFFF;

@@ -5,13 +5,14 @@ import me.comu.module.impl.active.Overlay;
 import me.comu.module.impl.combat.AutoArmor;
 import me.comu.module.impl.combat.AutoPotion;
 import me.comu.module.impl.combat.KillAura;
+import me.comu.module.impl.miscellaneous.AntiVanish;
 import me.comu.module.impl.miscellaneous.ChatSpammer;
 import me.comu.module.impl.miscellaneous.LagDetector;
 import me.comu.module.impl.miscellaneous.MiddleClickPerson;
+import me.comu.module.impl.movement.*;
 import me.comu.module.impl.player.InventoryCleaner;
 import me.comu.module.impl.player.PingSpoof;
 import me.comu.module.impl.player.Respawn;
-import me.comu.module.impl.movement.*;
 import me.comu.module.impl.render.*;
 import me.comu.module.impl.world.Timer;
 
@@ -40,6 +41,7 @@ public class ModuleManager extends Registry<Module> {
         register(new InventoryCleaner());
         register(new MiddleClickPerson());
         register(new LagDetector());
+        register(new AntiVanish());
 
         // Movement
         register(new Sprint());
@@ -57,6 +59,7 @@ public class ModuleManager extends Registry<Module> {
         register(new TabGui());
         register(new Freecam());
         register(new ViewClip());
+        register(new ItemESP());
 
         // World
         register(new Timer());
@@ -76,7 +79,7 @@ public class ModuleManager extends Registry<Module> {
         return registry.stream()
                 .filter(module ->
                         module instanceof ToggleableModule &&
-                        module.getName().equalsIgnoreCase(name) ||
+                                module.getName().equalsIgnoreCase(name) ||
                                 module.getDisplayName().equalsIgnoreCase(name) ||
                                 module.getAliases().stream().anyMatch(alias -> alias.equalsIgnoreCase(name)))
                 .findFirst()

@@ -2,6 +2,7 @@ package me.comu.mixin.render;
 
 import me.comu.Comu;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.gui.screen.ingame.InventoryScreen;
 import net.minecraft.client.option.Perspective;
 import net.minecraft.client.render.entity.LivingEntityRenderer;
 import net.minecraft.client.render.entity.model.EntityModel;
@@ -18,8 +19,9 @@ public abstract class MixinLivingEntityRenderer<T extends LivingEntity, S extend
     private void onUpdateRenderState(T entity, S state, float tickDelta, CallbackInfo ci) {
         MinecraftClient mc = MinecraftClient.getInstance();
         boolean isThirdPerson = mc.options.getPerspective() == Perspective.THIRD_PERSON_FRONT || mc.options.getPerspective() == Perspective.THIRD_PERSON_BACK;
+        boolean isInBlockingGui = mc.currentScreen instanceof InventoryScreen;
 
-        if (entity == mc.player && isThirdPerson) {
+        if (entity == mc.player && isThirdPerson && !isInBlockingGui) {
             var rotationManager = Comu.getInstance().getRotationManager();
 
             if (rotationManager.isRotating()) {

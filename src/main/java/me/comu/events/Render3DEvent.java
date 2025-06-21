@@ -1,23 +1,33 @@
 package me.comu.events;
 
 import me.comu.api.registry.event.Event;
+import me.comu.render.Renderer3D;
+import net.minecraft.client.render.VertexConsumerProvider;
 import net.minecraft.client.util.math.MatrixStack;
 
-public class Render3DEvent extends Event {
-    private final MatrixStack matrixStack;
-    private final float tickDelta;
-    private final double cameraX, cameraY, cameraZ;
 
-    public Render3DEvent(MatrixStack matrixStack, float tickDelta, double cameraX, double cameraY, double cameraZ) {
+public class Render3DEvent extends Event {
+
+    public MatrixStack matrixStack;
+    private final VertexConsumerProvider.Immediate consumers;
+    public float tickDelta;
+    public double offsetX, offsetY, offsetZ;
+
+    public Render3DEvent(MatrixStack matrixStack, VertexConsumerProvider.Immediate consumers, float tickDelta, double offsetX, double offsetY, double offsetZ) {
         this.matrixStack = matrixStack;
+        this.consumers = consumers;
         this.tickDelta = tickDelta;
-        this.cameraX = cameraX;
-        this.cameraY = cameraY;
-        this.cameraZ = cameraZ;
+        this.offsetX = offsetX;
+        this.offsetY = offsetY;
+        this.offsetZ = offsetZ;
     }
 
     public MatrixStack getMatrixStack() {
         return matrixStack;
+    }
+
+    public VertexConsumerProvider.Immediate getConsumers() {
+        return consumers;
     }
 
     public float getTickDelta() {
@@ -25,15 +35,14 @@ public class Render3DEvent extends Event {
     }
 
     public double getCameraX() {
-        return cameraX;
+        return offsetX;
     }
 
     public double getCameraY() {
-        return cameraY;
+        return offsetY;
     }
 
     public double getCameraZ() {
-        return cameraZ;
+        return offsetZ;
     }
 }
-

@@ -1,5 +1,6 @@
 package me.comu.config;
 
+import me.comu.config.configs.AccountsConfig;
 import me.comu.config.configs.ModulesConfig;
 import me.comu.config.configs.PeopleConfig;
 import me.comu.logging.Logger;
@@ -18,6 +19,7 @@ public class ConfigManager {
 
         register(new ModulesConfig(baseDirectory));
         register(new PeopleConfig(baseDirectory));
+        register(new AccountsConfig(baseDirectory));
     }
 
     public void register(Config config) {
@@ -39,5 +41,14 @@ public class ConfigManager {
 
     public File getConfigDirectory() {
         return configDir;
+    }
+
+    public <T extends Config> T getConfig(Class<T> clazz) {
+        for (Config config : configs) {
+            if (clazz.isInstance(config)) {
+                return clazz.cast(config);
+            }
+        }
+        throw new IllegalStateException("No config registered for " + clazz.getSimpleName());
     }
 }

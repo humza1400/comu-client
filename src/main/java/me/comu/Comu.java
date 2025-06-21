@@ -1,5 +1,6 @@
 package me.comu;
 
+import me.comu.account.AccountManager;
 import me.comu.api.registry.event.EventManager;
 import me.comu.api.registry.event.IEventManager;
 import me.comu.command.CommandManager;
@@ -13,9 +14,7 @@ import me.comu.people.friend.FriendManager;
 import me.comu.people.staff.StaffManager;
 import me.comu.render.HUDRenderer;
 import me.comu.rotation.RotationManager;
-import me.comu.skidcodedelete.MicrosoftLogin;
 import net.fabricmc.api.ClientModInitializer;
-
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import org.slf4j.Logger;
@@ -41,6 +40,7 @@ public class Comu implements ClientModInitializer {
     private FriendManager friendManager;
     private EnemyManager enemyManager;
     private StaffManager staffManager;
+    private AccountManager accountManager;
 
     @Override
     public void onInitializeClient() {
@@ -58,10 +58,9 @@ public class Comu implements ClientModInitializer {
         this.friendManager = new FriendManager();
         this.enemyManager = new EnemyManager();
         this.staffManager = new StaffManager();
+        this.accountManager = new AccountManager();
         this.configManager.loadAll();
 
-        // This will be removed soon for our own login api since it's a shitty library.
-//        MicrosoftLogin.setUserMicrosoft("", "");
         Hook.init();
         HUDRenderer.init();
         LOGGER.info(CLIENT_NAME + " initialized in {} ms", (System.nanoTime() / 1_000_000L) - startTime);
@@ -119,5 +118,9 @@ public class Comu implements ClientModInitializer {
 
     public StaffManager getStaffManager() {
         return staffManager;
+    }
+
+    public AccountManager getAccountManager() {
+        return accountManager;
     }
 }
