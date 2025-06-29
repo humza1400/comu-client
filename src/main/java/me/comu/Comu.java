@@ -7,6 +7,7 @@ import me.comu.command.CommandManager;
 import me.comu.config.ConfigManager;
 import me.comu.hooks.Hook;
 import me.comu.keybind.KeybindManager;
+import me.comu.macro.MacroManager;
 import me.comu.module.ModuleManager;
 import me.comu.notification.NotificationManager;
 import me.comu.people.enemy.EnemyManager;
@@ -41,6 +42,7 @@ public class Comu implements ClientModInitializer {
     private EnemyManager enemyManager;
     private StaffManager staffManager;
     private AccountManager accountManager;
+    private MacroManager macroManager;
 
     @Override
     public void onInitializeClient() {
@@ -59,6 +61,7 @@ public class Comu implements ClientModInitializer {
         this.enemyManager = new EnemyManager();
         this.staffManager = new StaffManager();
         this.accountManager = new AccountManager();
+        this.macroManager = new MacroManager();
         this.configManager.loadAll();
 
         Hook.init();
@@ -123,4 +126,6 @@ public class Comu implements ClientModInitializer {
     public AccountManager getAccountManager() {
         return accountManager;
     }
+
+    public MacroManager getMacroManager() { return macroManager; }
 }

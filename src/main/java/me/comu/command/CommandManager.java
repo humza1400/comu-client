@@ -30,7 +30,10 @@ public class CommandManager extends Registry<Command> {
         register(new Enemy.Remove());
         register(new Staff.Add());
         register(new Staff.Remove());
-
+        register(new Macro.Add());
+        register(new Macro.Remove());
+        register(new Macro.List());
+        register(new Macro.Reset());
         // Network
 
         // Player
